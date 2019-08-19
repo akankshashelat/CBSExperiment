@@ -229,15 +229,16 @@ function addLocations(passengerID){
     var pickup;
     if(passengerID > 1){
         setTimeout(function (){
-
-            console.log("Passenger id = ", passengerID);
+            //increase the timer for P1 (existing time + 180 seconds)
             let newDuration = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
             parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 180;
             updateTimer(newDuration, 1);
 
+            //calculates time for the announcement (existing time + 180 seconds)
             let minutes = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]);
             let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 180;
 
+            //adjust seconds and minutes based on added time.
             if(seconds >= 60) {
                 let sec = seconds;
                 seconds %= 60;
@@ -247,8 +248,6 @@ function addLocations(passengerID){
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
 
-            console.log("Minutes = ", minutes);
-            console.log("Seconds = ", seconds);
             let time = minutes + ":" + seconds;
 
             let timeAtOpen, timeAtClose;
@@ -529,6 +528,7 @@ function animateCar(cell, displacedCells, dir){
 
     //recursively calls itself to shift route
     function adjustRoute(){
+        let speed = 20;
         if(route.length > 0){
             var direction = route[0];
             switch(direction) {
@@ -540,11 +540,15 @@ function animateCar(cell, displacedCells, dir){
                         "transform": "rotate(0deg)"
                     });
 
-                    $("#car").supremate({"left": "+=70"}, 20, "linear", function(){
-                        route.shift();
-                        pauseAndRemove();
-                        adjustRoute();
+                    if(numStopsReached == 0){
+                        speed = 50;
+                    }
+                    $("#car").supremate({"left": "+=70"}, speed, "linear", function(){
+                            route.shift();
+                            pauseAndRemove();
+                            adjustRoute();
                     });
+
                     break;
                 case "u":
                     $("#car").css({
