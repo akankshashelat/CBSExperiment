@@ -229,21 +229,26 @@ function addLocations(passengerID){
     var pickup;
     if(passengerID > 1){
         setTimeout(function (){
+
+            console.log("Passenger id = ", passengerID);
             let newDuration = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
-            parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 23 + 23;
+            parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 180;
             updateTimer(newDuration, 1);
 
-            let minutes = parseInt(document.getElementById("timeP" + (passengerID - 1)).innerHTML.split(":")[0] / 60, 10);
-            let seconds = parseInt(document.getElementById("timeP" + (passengerID - 1)).innerHTML.split(":")[1] % 60, 10) + 23 + 23;
+            let minutes = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]);
+            let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 180;
 
-            while(seconds >= 60) {
+            if(seconds >= 60) {
+                let sec = seconds;
                 seconds %= 60;
-                minutes++;
+                minutes = minutes + Math.floor(sec / 60);
             }
 
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
 
+            console.log("Minutes = ", minutes);
+            console.log("Seconds = ", seconds);
             let time = minutes + ":" + seconds;
 
             let timeAtOpen, timeAtClose;
