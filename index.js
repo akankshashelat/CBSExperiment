@@ -528,7 +528,7 @@ function animateCar(cell, displacedCells, dir){
 
     //recursively calls itself to shift route
     function adjustRoute(){
-        let speed = 20;
+        let carSpeed = 20;
         if(route.length > 0){
             var direction = route[0];
             switch(direction) {
@@ -541,9 +541,9 @@ function animateCar(cell, displacedCells, dir){
                     });
 
                     if(numStopsReached == 0){
-                        speed = 50;
+                        carSpeed = 50;
                     }
-                    $("#car").supremate({"left": "+=70"}, speed, "linear", function(){
+                    $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
                             pauseAndRemove();
                             adjustRoute();
@@ -557,7 +557,7 @@ function animateCar(cell, displacedCells, dir){
                         "transform": "rotate(-90deg)"
                     });
 
-                    $("#car").supremate({"top": "-=70"}, 20, "linear", function(){
+                    $("#car").supremate({"top": "-=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
                         adjustRoute();
@@ -570,7 +570,7 @@ function animateCar(cell, displacedCells, dir){
                         "transform": "rotate(90deg)"
                     });
 
-                    $("#car").supremate({"top": "+=70"}, 20, "linear", function(){
+                    $("#car").supremate({"top": "+=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
                         adjustRoute();
@@ -585,7 +585,7 @@ function animateCar(cell, displacedCells, dir){
                         "transform": "rotate(0deg)"
                     });
 
-                    $("#car").supremate({"left": "+=70"}, 20, "linear", function(){
+                    $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
                         adjustRoute();
