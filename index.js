@@ -1,7 +1,7 @@
 //set the treatment number
 // Treatment 2: drop off order: P2, P3, P1
 let treatment = 2;
-
+let delayNotice = false;
 //sizeOfGrid
 let gridSize = 70;
 
@@ -208,13 +208,13 @@ function getLocations(){
 
         p1Mod = p1 % width;
         d1Mod = d1 % width;
-        p2Mod = p2 % width;
-        d2Mod = d2 % width;
+        // p2Mod = p2 % width;
+        // d2Mod = d2 % width;
 
         orderOfLocations[p1Mod] = p1;
         orderOfLocations[d1Mod] = d1;
-        orderOfLocations[p2Mod] = p2;
-        orderOfLocations[d2Mod] = d2;
+        // orderOfLocations[p2Mod] = p2;
+        // orderOfLocations[d2Mod] = d2;
     }
     //go to the end location always
     orderOfLocations[width] = endLocation;
@@ -227,7 +227,7 @@ function getLocations(){
 //displays the locations on screen for pick up only.
 function addLocations(passengerID){
     var pickup;
-    if(passengerID > 1){
+    if(passengerID == 2){
         setTimeout(function (){
             //increase the timer for P1 (existing time + 180 seconds)
             let newDuration = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
@@ -251,6 +251,7 @@ function addLocations(passengerID){
             let time = minutes + ":" + seconds;
 
             let timeAtOpen, timeAtClose;
+
             Swal.fire({
                 title: "Alert!",
                 text: "New Passenger added! New time is " + time,
@@ -259,6 +260,7 @@ function addLocations(passengerID){
                 allowEscapeKey: false,
                 allowEnterKey: false,
                 onOpen: function() {
+                    delayNotice = true;
                     timeAtOpen = performance.now();
                 },
                 onClose: function() {
@@ -292,8 +294,8 @@ function addLocations(passengerID){
     }
     else{ //if(passengerID == 3)
         //add the pick up image on the location.
-        pickup.append("<img class='pickup' src='images/d3p.png' "+
-        "alt='Destination'><strong class= 'locTag p3Tag pickupTag' >Pick up Passenger 3</strong>");
+        // pickup.append("<img class='pickup' src='images/d3p.png' "+
+        // "alt='Destination'><strong class= 'locTag p3Tag pickupTag' >Pick up Passenger 3</strong>");
     }
 }
 
@@ -528,7 +530,7 @@ function animateCar(cell, displacedCells, dir){
 
     //recursively calls itself to shift route
     function adjustRoute(){
-        let carSpeed = 20;
+        let carSpeed = 30;
         if(route.length > 0){
             var direction = route[0];
             switch(direction) {
@@ -539,9 +541,12 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(0deg)",
                         "transform": "rotate(0deg)"
                     });
-
+                    //the car is faster before P1 gets picked up, and then slows down.
                     if(numStopsReached == 0){
                         carSpeed = 50;
+                    }
+                    if(delayNotice == true){
+                        carSpeed = 10;
                     }
                     $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
@@ -556,7 +561,9 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(-90deg)",
                         "transform": "rotate(-90deg)"
                     });
-
+                    if(delayNotice == true){
+                        carSpeed = 10;
+                    }
                     $("#car").supremate({"top": "-=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
@@ -569,7 +576,9 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(90deg)",
                         "transform": "rotate(90deg)"
                     });
-
+                    if(delayNotice == true){
+                        carSpeed = 10;
+                    }
                     $("#car").supremate({"top": "+=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
