@@ -25,8 +25,10 @@ let columnIndex = [];
 
 //p0 is the participant
 //p1,p2,d1,d2
-let p0 = 0, p1 = 0, p2 = 0, d0 = 0, d1 = 0, d2 = 0;
-let p0Mod = 0, d0Mod = 0, p1Mod = 0, p2Mod = 0, d1Mod = 0, d2Mod = 0;
+let p0 = 0, d0 = 0;
+// p1 = 0, p2 = 0, , d1 = 0, d2 = 0;
+let p0Mod = 0, d0Mod = 0;
+// p1Mod = 0, p2Mod = 0, d1Mod = 0, d2Mod = 0;
 
 //user rating
 let ratingList = [];
@@ -93,9 +95,9 @@ function addToScreen() {
 
 //timer
 function updateTimer(duration, passengerID) {
-    if (passengerID > 1) {
-        countDown(passengerID);
-    }
+    // if (passengerID > 1) {
+    //     countDown(passengerID);
+    // }
 
     var display = document.querySelector('#timeP' + passengerID);
     var timer = duration, minutes, seconds;
@@ -117,38 +119,38 @@ function updateTimer(duration, passengerID) {
             }
         }, 1000);
     }
-    else if (passengerID === 2) {
-        clearInterval(timerInstance2);
-        timerInstance2 = setInterval(function () {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
+    // else if (passengerID === 2) {
+    //     clearInterval(timerInstance2);
+    //     timerInstance2 = setInterval(function () {
+    //         minutes = parseInt(timer / 60, 10);
+    //         seconds = parseInt(timer % 60, 10);
 
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
+    //         minutes = minutes < 10 ? "0" + minutes : minutes;
+    //         seconds = seconds < 10 ? "0" + seconds : seconds;
 
-            display.textContent = minutes + ":" + seconds;
+    //         display.textContent = minutes + ":" + seconds;
 
-            if (--timer < 0) {
-                timer = 00;
-            }
-        }, 1000);
-    }
-    else if (passengerID === 3) {
-        clearInterval(timerInstance3);
-        timerInstance3 = setInterval(function () {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
+    //         if (--timer < 0) {
+    //             timer = 00;
+    //         }
+    //     }, 1000);
+    // }
+    // else if (passengerID === 3) {
+    //     clearInterval(timerInstance3);
+    //     timerInstance3 = setInterval(function () {
+    //         minutes = parseInt(timer / 60, 10);
+    //         seconds = parseInt(timer % 60, 10);
 
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
+    //         minutes = minutes < 10 ? "0" + minutes : minutes;
+    //         seconds = seconds < 10 ? "0" + seconds : seconds;
 
-            display.textContent = minutes + ":" + seconds;
+    //         display.textContent = minutes + ":" + seconds;
 
-            if (--timer < 0) {
-                timer = 00;
-            }
-        }, 1000);
-    }
+    //         if (--timer < 0) {
+    //             timer = 00;
+    //         }
+    //     }, 1000);
+    // }
 }
 
 //displays start time from 1 minute and updates the timer.
@@ -229,14 +231,14 @@ function addLocations(passengerID){
     var pickup;
     if(passengerID == null){
         setTimeout(function (){
-            //increase the timer for P1 (existing time + 180 seconds)
+            //increase the timer for P1 (existing time + 60 seconds)
             let newDuration = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
-            parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 180;
+            parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 20;
             updateTimer(newDuration, 1);
 
-            //calculates time for the announcement (existing time + 180 seconds)
+            //calculates time for the announcement (existing time + 60 seconds)
             let minutes = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]);
-            let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 180;
+            let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 20;
 
             //adjust seconds and minutes based on added time.
             if(seconds >= 60) {
@@ -342,14 +344,14 @@ function updateRoute(cell){
     else if(carLocation + width < cell){
         //add the destination image to the screen along with the route.
         if(treatment == 2){
-            if(numStopsReached == 2){
-                var dropoff = $(".grid div:nth-child(" + d1 + ")");
-                dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
-            }
-            else if(numStopsReached == 4){
-                var dropoff = $(".grid div:nth-child(" + d2 + ")");
-                dropoff.append("<img class='destination' src='images/d3d.png' alt='Destination'><strong class= 'locTag p3Tag' >Drop off Passenger 3</strong>");
-            }
+            // if(numStopsReached == 2){
+            //     var dropoff = $(".grid div:nth-child(" + d1 + ")");
+            //     dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
+            // }
+            // else if(numStopsReached == 4){
+            //     var dropoff = $(".grid div:nth-child(" + d2 + ")");
+            //     dropoff.append("<img class='destination' src='images/d3d.png' alt='Destination'><strong class= 'locTag p3Tag' >Drop off Passenger 3</strong>");
+            // }
         }
         //direction is changed to "down" for animate to remove visited location
         direction = "down";
@@ -370,9 +372,9 @@ function updateRoute(cell){
 
         //display the displaced route
         //only if its not the first stop since that is handled separately
-        if (numStopsReached > 1) {
-            $(".minorRoute").css("display", "block");
-        }
+        // if (numStopsReached > 1) {
+        //     $(".minorRoute").css("display", "block");
+        // }
     }
     //pause before going back to track
     route.push("p");
@@ -439,27 +441,27 @@ function animateCar(cell, displacedCells, dir){
 
             //change the image to have passengers in car.
             if(treatment == 2){
-                if(numStopsReached == 1 || numStopsReached == 3 || numStopsReached == 5){
+                if(numStopsReached == 1){
                     document.getElementById("car").src = 'images/car1.png';
 
                 }
                 else if(numStopsReached == 2){
-                    document.getElementById("car").src = 'images/car2.png';
-                }
-                else if(numStopsReached == 4){
-                    document.getElementById("car").src = 'images/car3.png';
-                }
-                else{ //last stop 6 i.e car only has driver
                     document.getElementById("car").src = 'images/car.png';
                 }
+                // else if(numStopsReached == 4){
+                //     document.getElementById("car").src = 'images/car3.png';
+                // }
+                // else{ //last stop 6 i.e car only has driver
+                //     document.getElementById("car").src = 'images/car.png';
+                // }
 
-                //ADD CALL TO ADD TIMER FOR P2
-                if(numStopsReached == 2){
-                    updateTimer(30, 2);
-                }
-                else if(numStopsReached == 4){
-                    updateTimer(30, 3);
-                }
+                // //ADD CALL TO ADD TIMER FOR P2
+                // if(numStopsReached == 2){
+                //     updateTimer(30, 2);
+                // }
+                // else if(numStopsReached == 4){
+                //     updateTimer(30, 3);
+                // }
 
                 //update timers to remove them from screen once their destination is reached.
                 // if(numStopsReached == 3){
@@ -479,10 +481,10 @@ function animateCar(cell, displacedCells, dir){
 
 
             //add location of second passenger to the screen according to the treatment
-            if(treatment == 2 && numStopsReached == 3){
-                addLocations(3);
-            }
-            if(numStopsReached == 6){
+            // if(treatment == 2 && numStopsReached == 3){
+            //     addLocations(3);
+            // }
+            if(numStopsReached == 2){
                 clearInterval(ratingInterval);
 
                 let timeAtOpen, timeAtClose;
@@ -546,7 +548,7 @@ function animateCar(cell, displacedCells, dir){
                         carSpeed = 50;
                     }
                     if(delayNotice == true){
-                        carSpeed = 10;
+                        carSpeed = 15;
                     }
                     $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
@@ -562,7 +564,7 @@ function animateCar(cell, displacedCells, dir){
                         "transform": "rotate(-90deg)"
                     });
                     if(delayNotice == true){
-                        carSpeed = 10;
+                        carSpeed = 15;
                     }
                     $("#car").supremate({"top": "-=70"}, carSpeed, "linear", function(){
                         route.shift();
@@ -577,7 +579,7 @@ function animateCar(cell, displacedCells, dir){
                         "transform": "rotate(90deg)"
                     });
                     if(delayNotice == true){
-                        carSpeed = 10;
+                        carSpeed = 15;
                     }
                     $("#car").supremate({"top": "+=70"}, carSpeed, "linear", function(){
                         route.shift();
