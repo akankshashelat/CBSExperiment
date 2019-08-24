@@ -200,22 +200,22 @@ function getLocations(){
     var fourth = (startLocation + (fifthWidth * 4)) +  (fifthHeight * width);
 
     //p2 gets dropped off after p1
-    if(treatment == 2){
-        p1 = first;
-        d1 = second;
-        p2 = third;
-        d2 = fourth;
+    // if(treatment == 2){
+    //     p1 = first;
+    //     d1 = second;
+    //     p2 = third;
+    //     d2 = fourth;
 
-        p1Mod = p1 % width;
-        d1Mod = d1 % width;
-        // p2Mod = p2 % width;
-        // d2Mod = d2 % width;
+    //     p1Mod = p1 % width;
+    //     d1Mod = d1 % width;
+    //     p2Mod = p2 % width;
+    //     d2Mod = d2 % width;
 
-        orderOfLocations[p1Mod] = p1;
-        orderOfLocations[d1Mod] = d1;
-        // orderOfLocations[p2Mod] = p2;
-        // orderOfLocations[d2Mod] = d2;
-    }
+    //     orderOfLocations[p1Mod] = p1;
+    //     orderOfLocations[d1Mod] = d1;
+    //     orderOfLocations[p2Mod] = p2;
+    //     orderOfLocations[d2Mod] = d2;
+    // }
     //go to the end location always
     orderOfLocations[width] = endLocation;
 
@@ -227,7 +227,7 @@ function getLocations(){
 //displays the locations on screen for pick up only.
 function addLocations(passengerID){
     var pickup;
-    if(passengerID == 2){
+    if(passengerID == null){
         setTimeout(function (){
             //increase the timer for P1 (existing time + 180 seconds)
             let newDuration = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
@@ -254,7 +254,7 @@ function addLocations(passengerID){
 
             Swal.fire({
                 title: "Alert!",
-                text: "New Passenger added! New time is " + time,
+                text: "Delayed! New time is " + time,
                 type: "info",
                 allowOutsideClick: false,
                 allowEscapeKey: false,
@@ -287,16 +287,16 @@ function addLocations(passengerID){
         dropoff.append("<img class='p1dest'src='images/d1d.png' alt='Destination'>"+
         "<strong class= 'p1Tag locTag' >Your Dropoff !</strong>");
     }
-    else if(passengerID == 2){
-        //add the pick up image on the location.
-        pickup.append("<img class='pickup' src='images/d2p.png'"+
-        "alt='Destination'><strong class= 'locTag p2Tag pickupTag' >Pick up Passenger 2</strong>");
-    }
-    else{ //if(passengerID == 3)
-        //add the pick up image on the location.
-        // pickup.append("<img class='pickup' src='images/d3p.png' "+
-        // "alt='Destination'><strong class= 'locTag p3Tag pickupTag' >Pick up Passenger 3</strong>");
-    }
+    // else if(passengerID == 2){
+    //     //add the pick up image on the location.
+    //     pickup.append("<img class='pickup' src='images/d2p.png'"+
+    //     "alt='Destination'><strong class= 'locTag p2Tag pickupTag' >Pick up Passenger 2</strong>");
+    // }
+    // else{ //if(passengerID == 3)
+    //     //add the pick up image on the location.
+    //     pickup.append("<img class='pickup' src='images/d3p.png' "+
+    //     "alt='Destination'><strong class= 'locTag p3Tag pickupTag' >Pick up Passenger 3</strong>");
+    // }
 }
 
 //creates route to the next location
@@ -426,7 +426,7 @@ function animateCar(cell, displacedCells, dir){
 
                 setTimeout(function(){
                     //second passenger locations after 5 second delay
-                    addLocations(2);
+                    addLocations();
                 }, 5000);
             }
 
