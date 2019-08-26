@@ -278,7 +278,8 @@ function addLocations(passengerID){
     $(".minorRoute").css("display", "block");
 
     //gets the DOM element for the pick up location.
-    var pickup = $(".grid div:nth-child(" + (passengerID == 1 ? p0 : passengerID == 2 ? p1 : p2) + ")");
+    // var pickup = $(".grid div:nth-child(" + (passengerID == 1 ? p0 : passengerID == 2 ? p1 : p2) + ")");
+    var pickup = $(".grid div:nth-child(" + p0 + ")");
 
     if(passengerID == 1){
         //add the pick up image on the location.
@@ -386,6 +387,26 @@ function updateRoute(cell){
         animateCar(cell, displacedCells, direction);
     }, 2500);
 
+}
+
+function redirectURL(){
+    let numRatings = ratingList.length;
+    let numResponses = responseTimes.length;
+
+    let url ="https://umich.qualtrics.com/jfe/form/SV_6QHpFtdIs6UYZoN?";
+    for(var i = 1; i <= numRatings; i++){
+        url = url + "starRating" + i + "=" + ratingList[i-1] + "&";
+    }
+
+    for(var i = 1; i <= numResponses; i++){
+        url = url + "respTime" + i + "=" + responseTimes[i-1] + "&";
+    }
+    //remove last & sign
+    url = url.slice(0,-1);
+
+    //console.log(url); FOR TESTING URL
+
+    window.location.replace(url);
 }
 
 //animate car includes:
@@ -501,6 +522,7 @@ function animateCar(cell, displacedCells, dir){
                     onClose: function() {
                         timeAtClose = performance.now();
                         responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
+                        redirectURL();
                     }
                 });
             }
