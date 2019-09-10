@@ -273,8 +273,7 @@ function redirectURL(){
     url = url.slice(0,-1);
 
     //console.log(url); FOR TESTING URL
-
-    // window.location.replace(url);
+    window.location.replace(url);
 }
 
 //animate car includes:

@@ -1,0 +1,179 @@
+html,
+body {
+  height: 100%;
+  background-color: white;
+  padding: 0;
+}
+
+.grid {
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-width: 1px 0 0 1px;
+    position: relative;
+}
+
+.grid div {
+    border: 1px solid #ccc;
+    border-width: 0 1px 1px 0;
+    float: left;
+    text-align: center;
+}
+
+#car {
+    height: 50px;
+    width: 88px;
+    top: 45px;
+    position: relative;
+    z-index: 4;
+}
+/* the horizontal route */
+.majorRoute {
+    height: 7px;
+    position: relative;
+    color: black;
+    border-style: solid;
+    border-width: 0px 0px 15px 0px;
+    border-bottom-style: dashed;
+    bottom: 7px;
+    opacity: 0.9;
+}
+/* the road for up/down */
+.minorRoute {
+    height: 30px;
+    width: 16px;
+    background-color: black;
+    color: black;
+    margin-left: 39px;
+    position: absolute;
+    margin-top: 20px;
+    z-index: 2;
+    opacity: 0.9;
+    border: none !important;
+    display: none;
+}
+/* circle img for p1 */
+.p1pick {
+    width: 20px;
+    margin-top: 40px;
+    left: 165px;
+    z-index: 1;
+    position: absolute;
+}
+/* flag img for p1 */
+.p1dest {
+    height: 45px;
+    width: 50px;
+    z-index: 1;
+    position: absolute;
+    margin-top: 15px;
+}
+/* pickup circle images for p2, p3*/
+.pickup {
+    height: 20px;
+    width: 20px;
+    margin-top: 60px;
+    margin-left: 25px;
+    z-index: 1;
+    position: relative;
+}
+/* destination flag imgs for p2, p3*/
+.destination {
+    height: 45px;
+    width: 50px;
+    margin-top: 55px;
+    margin-left: 20px;
+    z-index: 1;
+    position: relative;
+}
+
+/* the description tag of location imgs */
+.locTag {
+    position: relative;
+    font-size: smaller;
+    z-index: 3;
+}
+
+.p1Tag {
+    top: 82px;
+    color: #BF0000;
+}
+
+.p2Tag {
+    color: #0000BF;
+}
+
+.p3Tag {
+    color: #007F00;
+}
+/* placing the tag above the pickup img for p2, p3 */
+.pickupTag {
+    bottom: 65px;
+}
+
+.tagAbove {
+    bottom: 85px;
+}
+
+.timer {
+    position: absolute;
+    background-color: black;
+    z-index: 1;
+    height: 70px;
+    text-align: center;
+    color: white;
+    width: 211px;
+}
+
+.timerText {
+    display: grid;
+    margin: auto;
+    padding-top: 8px;
+}
+
+#attribution {
+    position: fixed;
+    bottom: 0;
+    font-size: 10px;
+}
+
+th,td {
+    text-align: center;
+}
+
+th {
+    height: 50px;
+}
+
+#timeBoard {
+    width: 30%;
+    margin-left: 35%;
+    margin-right: 35%;
+    border: 4px solid black;
+    background-color: white;
+    position: fixed;
+    z-index: 4;
+}
+
+#timeBoardP1 {
+    display: none;
+}
+
+#timeBoardP2 {
+    display: none;
+}
+
+#timeBoardP3 {
+    display: none;
+}
+
+#p1Time{
+    color: #BF0000;
+}
+
+#p2Time{
+    color:#0000BF;
+}
+
+#p3Time{
+    color:#007F00;
+}
