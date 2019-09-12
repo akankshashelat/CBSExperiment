@@ -350,7 +350,6 @@ function updateRoute(cell){
             var dropoff = $(".grid div:nth-child(" + d1 + ")");
             dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
         }
-
         //direction is changed to "down" for animate to remove visited location
         direction = "down";
         //gets to the same column
@@ -456,7 +455,6 @@ function animateCar(cell, displacedCells, dir){
             // }
 
             //change the image to have passengers in car.
-
             if(numStopsReached == 1 || numStopsReached == 5){
                 document.getElementById("car").src = 'images/car1.png';
             }
@@ -497,7 +495,7 @@ function animateCar(cell, displacedCells, dir){
 
 
             //add location of third passenger to the screen according to the treatment
-            if(treatment == 2 && numStopsReached == 2){
+            if(numStopsReached == 2){
                 addLocations(3);
             }
             if(numStopsReached == 6){

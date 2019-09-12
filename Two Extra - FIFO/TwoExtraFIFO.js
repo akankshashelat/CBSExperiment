@@ -1,5 +1,4 @@
 //set the treatment number
-// Treatment 2: drop off order: P2, P3, P1
 let treatment = 2;
 let delayNotice = false;
 //sizeOfGrid
@@ -11,6 +10,7 @@ let height = Math.floor($(window).height()/gridSize);
 //previous timer instances
 let timerInstance1;
 let timerInstance2;
+let timerInstance3;
 
 //ROW RANGE CALCULATIONS
 //rowRange divides the screen into 3 parts and uses the middle part only
@@ -23,10 +23,10 @@ let orderOfLocations = {};
 let columnIndex = [];
 
 //p0 is the participant
-let p0 = 0, d0 = 0, p1 = 0, d1 = 0;
-
-let p0Mod = 0, d0Mod = 0;
-let p1Mod = 0, p2Mod = 0;
+//p0 is the participant
+//p1,p2,d1,d2
+let p0 = 0, p1 = 0, p2 = 0, d0 = 0, d1 = 0, d2 = 0;
+let p0Mod = 0, d0Mod = 0, p1Mod = 0, p2Mod = 0, d1Mod = 0, d2Mod = 0;
 
 
 //user rating
@@ -134,12 +134,28 @@ function updateTimer(duration, passengerID) {
             }
         }, 1000);
     }
+    else if (passengerID === 3) {
+        clearInterval(timerInstance3);
+        timerInstance3 = setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                timer = 00;
+            }
+        }, 1000);
+    }
 }
 
 //displays the countdown, countdown starts from 3 mins.
 //calls updateTimer
 function countDown(passengerID) {
-    //start the timer from 1 minutes
+    //start the timer for P1 from 3 minutes
     let countDown, countdownText;
     if (passengerID == 1) {
         countDown = 3;
@@ -174,7 +190,7 @@ function getLocations(){
     p0Mod = p0 % width;
     orderOfLocations[p0Mod] = p0;
 
-    d0 = startLocation + 10;
+    d0 = startLocation + (width/2);
     d0Mod = d0 % width;
     orderOfLocations[d0Mod] = d0;
 
@@ -185,17 +201,29 @@ function getLocations(){
     var fifthHeight = Math.floor(height/5);
 
     //values for locations for additional passengers
-    var first = (startLocation + fourthWidth) - width;
-    var second = (startLocation + (fifthWidth * 4)) +  (fifthHeight * width);
+    var first = (startLocation + fifthWidth) - width;
+    var second = (startLocation + (fifthWidth * 2)) +  (fifthHeight * width); //for P2 pickup
+    var third = startLocation + (fifthWidth * 3) + (fifthHeight * width);
+    var fourth = (startLocation + (fifthWidth * 4)) -  (fifthHeight * width);
 
     p1 = first;
     p1Mod = p1 % width;
 
-    d1 = second;
+    d1 = third;
     d1Mod = d1 % width;
+
+    p2 = second;
+    p2Mod = p2 % width;
+
+    d2 = fourth;
+    d2Mod = d2 % width;
+
 
     orderOfLocations[p1Mod] = p1;
     orderOfLocations[d1Mod] = d1;
+
+    orderOfLocations[p2Mod] = p2;
+    orderOfLocations[d2Mod] = d2;
 
     //go to the end location always
     orderOfLocations[width] = endLocation;
@@ -257,7 +285,7 @@ function addLocations(passengerID){
     $(".minorRoute").css("display", "block");
 
     //gets the DOM element for the pick up location.
-    var pickup = $(".grid div:nth-child(" + (passengerID == 1 ? p0 : p1) + ")");
+    var pickup = $(".grid div:nth-child(" + (passengerID == 1 ? p0 : passengerID == 2 ? p1 : p2) + ")");
 
     if(passengerID == 1){
         //add the pick up image on the location.
@@ -272,6 +300,11 @@ function addLocations(passengerID){
         //add the pick up image on the location.
         pickup.append("<img class='pickup' src='images/d2p.png'"+
         "alt='Destination'><strong class= 'locTag p2Tag pickupTag' >Pick up Passenger 2</strong>");
+    }
+    else{ //if(passengerID == 3)
+        //add the pick up image on the location.
+        pickup.append("<img class='pickup' src='images/d3p.png' "+
+        "alt='Destination'><strong class= 'locTag p3Tag' >Pick up Passenger 3</strong>");
     }
 }
 
@@ -292,7 +325,6 @@ function updateRoute(cell){
     }
     // if location is above
     else if (carLocation > cell){
-
         //direction is changed to "up" for animate to remove visited location
         direction = "up";
         //gets to the same column
@@ -317,6 +349,11 @@ function updateRoute(cell){
     //if location is down
     else if(carLocation + width < cell){
 
+        //add the destination image to the screen along with the route.
+        if(numStopsReached == 3){
+            var dropoff = $(".grid div:nth-child(" + d1 + ")");
+            dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
+        }
         //direction is changed to "down" for animate to remove visited location
         direction = "down";
         //gets to the same column
@@ -413,33 +450,49 @@ function animateCar(cell, displacedCells, dir){
                     addLocations(2);
                 }, 5000);
             }
-            //change the image to have passengers in car.
 
+            //change the image to have passengers in car.
             if(numStopsReached == 1){
                 document.getElementById("car").src = 'images/car1.png';
-
             }
             else if(numStopsReached == 2){
                 document.getElementById("car").src = 'images/car2.png';
             }
             else if(numStopsReached == 3){
-                document.getElementById("car").src = 'images/car5.png';
+                document.getElementById("car").src = 'images/car4.png';
             }
-            else if(numStopsReached == 4){//last stop 4 i.e car only has driver
+            else if(numStopsReached == 4){//
+                document.getElementById("car").src = 'images/car6.png';
+            }
+            else if(numStopsReached == 5){//
+                document.getElementById("car").src = 'images/car7.png';
+            }
+            else if(numStopsReached == 6){//
                 document.getElementById("car").src = 'images/car.png';
             }
 
             //ADD CALL TO ADD TIMER FOR P2
             if(numStopsReached == 2){
-                updateTimer(70, 2);
+                updateTimer(45, 2);
                 //add the destination image once P2 is picked up.
                 var dropoff = $(".grid div:nth-child(" + d1 + ")");
                 dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'>" +
                 "<strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
+
+                addLocations(3);
+
+            }
+            //ADD TIMER FOR P3
+            if(numStopsReached == 3){
+                updateTimer(45, 3);
+                //add the destination image to the screen along with the route.
+                var dropoff = $(".grid div:nth-child(" + d2 + ")");
+                dropoff.append("<img class='destination' src='images/d3d.png' alt='Destination'>" +
+                "<strong class= 'locTag p3Tag tagAbove' >Drop off Passenger 3</strong>");
             }
 
             //update timers to remove them from screen once their destination is reached.
-            if(numStopsReached == 3){
+            if(numStopsReached == 4){
                 clearInterval(timerInstance1);
                 document.getElementById("p1Time").style.display = "none";
                 clearInterval(ratingInterval);
@@ -461,11 +514,17 @@ function animateCar(cell, displacedCells, dir){
                     }
                 });
             }
-
-            if(numStopsReached == 4){
+            else if(numStopsReached == 5){
+                clearInterval(timerInstance2);
                 document.getElementById("p2Time").style.display = "none";
             }
-            if(numStopsReached == 5){
+
+            else if(numStopsReached == 6){
+                clearInterval(timerInstance3);
+                document.getElementById("p3Time").style.display = "none";
+            }
+
+            if(numStopsReached == 7){
                 redirectURL();
             }
 
