@@ -193,30 +193,37 @@ function getLocations(){
     p0Mod = p0 % width;
     orderOfLocations[p0Mod] = p0;
 
+    d0 = endLocation - 2;
+    d0Mod = d0 % width;
+    orderOfLocations[d0Mod] = d0;
+
+    //the width between p0 and d0
+    var middleWidth = width - 6;
+
+    //divides grid into equal portions to space out locations.
+    //this is to account for screen sizes.
+    var fourthWidth = Math.floor(middleWidth/4); //divide the middle space into 4 sections
+    var fifthHeight = Math.floor(height/5);
+
     //values for locations for additional passengers
-    var first = (startLocation + fifthWidth) - width;
-    var second = (startLocation + (fifthWidth * 2)) +  (fifthHeight * width);
-    var third = startLocation + (fifthWidth * 3) - (fifthHeight * width);
-    var fourth = (startLocation + (fifthWidth * 4)) +  (fifthHeight * width);
+    p1 = (p0 + fourthWidth) - width;
+    p1Mod = p1 % width;
 
-    //p2 gets dropped off after p1
-    if(treatment == 2){
-        p1 = first;
-        d1 = fourth;
+    d1 = p0 + (fourthWidth * 4) + (fifthHeight * width);
+    d1Mod = d1 % width;
 
-        p2 = second;
-        d2 = third;
+    orderOfLocations[p1Mod] = p1;
+    orderOfLocations[d1Mod] = d1;
 
-        p1Mod = p1 % width;
-        d1Mod = d1 % width;
-        p2Mod = p2 % width;
-        d2Mod = d2 % width;
+    p2 = p0 + (2 * fourthWidth) + (fifthHeight * width);
+    d2 = p0 + (3 * fourthWidth) - (fifthHeight * width);
 
-        orderOfLocations[p1Mod] = p1;
-        orderOfLocations[d1Mod] = d1;
-        orderOfLocations[p2Mod] = p2;
-        orderOfLocations[d2Mod] = d2;
-    }
+    p2Mod = p2 % width;
+    d2Mod = d2 % width;
+
+    orderOfLocations[p2Mod] = p2;
+    orderOfLocations[d2Mod] = d2;
+
     //go to the end location always
     orderOfLocations[width] = endLocation;
 
@@ -284,7 +291,7 @@ function addLocations(passengerID){
         pickup.append("<img class='p1pick' src='images/d1p.png'"+
         "alt='Destination'><strong class= 'locTag p1Tag'> Your Pickup !</strong>");
 
-        var dropoff = $(".grid div:nth-child(" + endLocation + ")");
+        var dropoff = $(".grid div:nth-child(" + d0 + ")");
         dropoff.append("<img class='p1dest'src='images/d1d.png' alt='Destination'>"+
         "<strong class= 'p1Tag locTag' >Your Dropoff !</strong>");
     }
@@ -475,7 +482,7 @@ function animateCar(cell, displacedCells, dir){
             if(numStopsReached == 2){
                 updateTimer(30, 2);
             }
-            else if(numStopsReached == 4){
+            else if(numStopsReached == 3){
                 updateTimer(30, 3);
             }
 

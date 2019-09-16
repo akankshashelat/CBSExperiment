@@ -28,7 +28,6 @@ let p0 = 0, d0 = 0, p1 = 0, d1 = 0;
 let p0Mod = 0, d0Mod = 0;
 let p1Mod = 0, p2Mod = 0;
 
-
 //user rating
 let ratingList = [];
 let ratingInterval;
@@ -174,24 +173,23 @@ function getLocations(){
     p0Mod = p0 % width;
     orderOfLocations[p0Mod] = p0;
 
-    d0 = startLocation + 10;
+    d0 = endLocation - 2;
     d0Mod = d0 % width;
     orderOfLocations[d0Mod] = d0;
 
+    //the width between p0 and d0
+    var middleWidth = width - 6;
+
     //divides grid into equal portions to space out locations.
     //this is to account for screen sizes.
-    var fourthWidth = Math.floor(width/4);
-    var fifthWidth = Math.floor(width/5);
+    var fourthWidth = Math.floor(middleWidth/4); //divide the middle space into 4 sections
     var fifthHeight = Math.floor(height/5);
 
     //values for locations for additional passengers
-    var first = (startLocation + fourthWidth) - width;
-    var second = (startLocation + (fifthWidth * 4)) +  (fifthHeight * width);
-
-    p1 = first;
+    p1 = (p0 + fourthWidth) - width;
     p1Mod = p1 % width;
 
-    d1 = second;
+    d1 = (endLocation - 1) + (fifthHeight * width);
     d1Mod = d1 % width;
 
     orderOfLocations[p1Mod] = p1;
@@ -279,7 +277,6 @@ function addLocations(passengerID){
 function updateRoute(cell){
     let displacedCells = 0; //number of cells moved up/down
     let direction = '';
-    var dest = 0; //passengerID for drop off
 
     //get the best route between car and cell
     //if location in the same line => keep going right
@@ -302,7 +299,7 @@ function updateRoute(cell){
         }
         //go up
         while (carLocation > cell){
-            $(".grid div:nth-child("+ (carLocation) + ")").prepend("<div class='minorRoute'></div>");
+            // $(".grid div:nth-child("+ (carLocation) + ")").prepend("<div class='minorRoute'></div>");
             carLocation -= width;
             route.push("u");
             displacedCells++;
@@ -329,7 +326,7 @@ function updateRoute(cell){
             carLocation += width;
 
             //adds the route to destination on the screen.
-            $(".grid div:nth-child("+ (carLocation) + ")").prepend("<div class='minorRoute'></div>");
+            // $(".grid div:nth-child("+ (carLocation) + ")").prepend("<div class='minorRoute'></div>");
             route.push("d");
             displacedCells++;
         }
@@ -436,6 +433,13 @@ function animateCar(cell, displacedCells, dir){
                 var dropoff = $(".grid div:nth-child(" + d1 + ")");
                 dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'>" +
                 "<strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
+
+                let minorCalculate = d1;
+                while (minorCalculate > (endLocation - 1)) {
+                    $(".grid div:nth-child("+ minorCalculate + ")").prepend("<div class='minorRoute'></div>");
+                    minorCalculate = minorCalculate - width;
+                }
+                $(".minorRoute").css("display", "block");
             }
 
             //update timers to remove them from screen once their destination is reached.
@@ -458,15 +462,13 @@ function animateCar(cell, displacedCells, dir){
                     onClose: function() {
                         timeAtClose = performance.now();
                         responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
+                        redirectURL();
                     }
                 });
             }
 
             if(numStopsReached == 4){
                 document.getElementById("p2Time").style.display = "none";
-            }
-            if(numStopsReached == 5){
-                redirectURL();
             }
 
             setTimeout(function(){

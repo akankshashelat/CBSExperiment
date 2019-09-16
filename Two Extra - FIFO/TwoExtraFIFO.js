@@ -28,7 +28,6 @@ let columnIndex = [];
 let p0 = 0, p1 = 0, p2 = 0, d0 = 0, d1 = 0, d2 = 0;
 let p0Mod = 0, d0Mod = 0, p1Mod = 0, p2Mod = 0, d1Mod = 0, d2Mod = 0;
 
-
 //user rating
 let ratingList = [];
 let ratingInterval;
@@ -190,37 +189,33 @@ function getLocations(){
     p0Mod = p0 % width;
     orderOfLocations[p0Mod] = p0;
 
-    d0 = startLocation + (width/2);
+    d0 = endLocation - 2;
     d0Mod = d0 % width;
     orderOfLocations[d0Mod] = d0;
 
+    //the width between p0 and d0
+    var middleWidth = width - 6;
+
     //divides grid into equal portions to space out locations.
     //this is to account for screen sizes.
-    var fourthWidth = Math.floor(width/4);
-    var fifthWidth = Math.floor(width/5);
+    var fourthWidth = Math.floor(middleWidth/4); //divide the middle space into 4 sections
     var fifthHeight = Math.floor(height/5);
 
     //values for locations for additional passengers
-    var first = (startLocation + fifthWidth) - width;
-    var second = (startLocation + (fifthWidth * 2)) +  (fifthHeight * width); //for P2 pickup
-    var third = startLocation + (fifthWidth * 3) + (fifthHeight * width);
-    var fourth = (startLocation + (fifthWidth * 4)) -  (fifthHeight * width);
-
-    p1 = first;
+    p1 = (p0 + fourthWidth) - width;
     p1Mod = p1 % width;
 
-    d1 = third;
+    d1 = (endLocation - 1) + (fifthHeight * width);
     d1Mod = d1 % width;
-
-    p2 = second;
-    p2Mod = p2 % width;
-
-    d2 = fourth;
-    d2Mod = d2 % width;
-
 
     orderOfLocations[p1Mod] = p1;
     orderOfLocations[d1Mod] = d1;
+
+    p2 = p0 + (2 * fourthWidth) + (fifthHeight * width);
+    p2Mod = p2 % width;
+
+    d2 = (endLocation - 1) - (fifthHeight * width);
+    d2Mod = d2 % width;
 
     orderOfLocations[p2Mod] = p2;
     orderOfLocations[d2Mod] = d2;
@@ -479,6 +474,13 @@ function animateCar(cell, displacedCells, dir){
                 dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'>" +
                 "<strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
 
+                let minorCalculate1 = d1;
+                while (minorCalculate1 > (endLocation - 1)) {
+                    $(".grid div:nth-child("+ minorCalculate1 + ")").prepend("<div class='minorRoute'></div>");
+                    minorCalculate1 = minorCalculate1 - width;
+                }
+                $(".minorRoute").css("display", "block");
+
                 addLocations(3);
 
             }
@@ -489,6 +491,13 @@ function animateCar(cell, displacedCells, dir){
                 var dropoff = $(".grid div:nth-child(" + d2 + ")");
                 dropoff.append("<img class='destination' src='images/d3d.png' alt='Destination'>" +
                 "<strong class= 'locTag p3Tag tagAbove' >Drop off Passenger 3</strong>");
+
+                let minorCalculate2 = d2 + width;
+                while (minorCalculate2 < (endLocation - 1)) {
+                    $(".grid div:nth-child("+ minorCalculate2 + ")").prepend("<div class='minorRoute'></div>");
+                    minorCalculate2 = minorCalculate2 + width;
+                }
+                $(".minorRoute").css("display", "block");
             }
 
             //update timers to remove them from screen once their destination is reached.
@@ -511,6 +520,7 @@ function animateCar(cell, displacedCells, dir){
                     onClose: function() {
                         timeAtClose = performance.now();
                         responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
+                        redirectURL();
                     }
                 });
             }
@@ -522,10 +532,6 @@ function animateCar(cell, displacedCells, dir){
             else if(numStopsReached == 6){
                 clearInterval(timerInstance3);
                 document.getElementById("p3Time").style.display = "none";
-            }
-
-            if(numStopsReached == 7){
-                redirectURL();
             }
 
             setTimeout(function(){

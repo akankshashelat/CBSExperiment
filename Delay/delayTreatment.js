@@ -12,8 +12,6 @@ let height = Math.floor($(window).height()/gridSize);
 
 //previous timer instances
 let timerInstance1;
-let timerInstance2;
-let timerInstance3;
 
 //ROW RANGE CALCULATIONS
 //rowRange divides the screen into 3 parts and uses the middle part only
@@ -27,9 +25,9 @@ let columnIndex = [];
 
 //p0 is the participant
 //p1,p2,d1,d2
-let p0 = 0, d0 = 0;
+let p0 = 0;
 // p1 = 0, p2 = 0, , d1 = 0, d2 = 0;
-let p0Mod = 0, d0Mod = 0;
+let p0Mod = 0;
 // p1Mod = 0, p2Mod = 0, d1Mod = 0, d2Mod = 0;
 
 //user rating
@@ -181,7 +179,7 @@ function getLocations(){
     p0Mod = p0 % width;
     orderOfLocations[p0Mod] = p0;
 
-    orderOfLocations[width] = endLocation;
+    orderOfLocations[width] = endLocation - 2;
 
     //makes a list of all locations in order.
     columnIndex = Object.keys(orderOfLocations);
@@ -245,7 +243,7 @@ function addLocations(passengerID){
         pickup.append("<img class='p1pick' src='images/d1p.png'"+
         "alt='Destination'><strong class= 'locTag p1Tag'> Your Pickup !</strong>");
 
-        var dropoff = $(".grid div:nth-child(" + endLocation + ")");
+        var dropoff = $(".grid div:nth-child(" + (endLocation - 2) + ")");
         dropoff.append("<img class='p1dest'src='images/d1d.png' alt='Destination'>"+
         "<strong class= 'p1Tag locTag' >Your Dropoff !</strong>");
     }
