@@ -10,7 +10,9 @@ let gridSize = 70;
 //screen
 let width = Math.floor($(window).width()/gridSize);
 let height = Math.floor($(window).height()/gridSize);
-
+let ratioW = Math.floor($(window).width()/gridSize),
+ratioH = Math.floor($(window).height()/gridSize);
+console.log(ratioW);
 
 //previous timer instances
 let timerInstance1;
@@ -26,11 +28,8 @@ let orderOfLocations = {};
 let columnIndex = [];
 
 //p0 is the participant
-//p1,p2,d1,d2
 let p0 = 0, d0 = 0;
-// p1 = 0, p2 = 0, , d1 = 0, d2 = 0;
 let p0Mod = 0, d0Mod = 0;
-// p1Mod = 0, p2Mod = 0, d1Mod = 0, d2Mod = 0;
 
 //user rating
 let ratingList = [];
@@ -55,8 +54,8 @@ let numStopsReached = 0;
 
 //creates the grid layout of size W x H of screen
 function createGrid() {
-    var ratioW = Math.floor($(window).width()/gridSize),
-        ratioH = Math.floor($(window).height()/gridSize);
+//     var ratioW = Math.floor($(window).width()/gridSize),
+//         ratioH = Math.floor($(window).height()/gridSize);
 
     var parent = $('<div />', {
         class: 'grid',
@@ -95,6 +94,28 @@ function addToScreen() {
     $(".minorRoute").height($(".grid div").height());
 }
 
+function endNotice(){
+    clearInterval(ratingInterval);
+
+    let timeAtOpen, timeAtClose;
+    Swal.fire({
+        title: "Notice",
+        text: "You have reached your destination!",
+        type: "success",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        onOpen: function() {
+            timeAtOpen = performance.now();
+        },
+        onClose: function() {
+            timeAtClose = performance.now();
+            responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
+            redirectURL();
+        }
+    });
+
+}
 //timer
 function updateTimer(duration, passengerID) {
 
@@ -115,6 +136,10 @@ function updateTimer(duration, passengerID) {
             if (--timer < 0) {
                 //if it reaches 00, keep it there.
                 timer = 00;
+                if(numStopsReached == 2){
+                    clearInterval(timerInstance1);
+                    endNotice();
+                }
             }
         }, 1000);
     }
@@ -156,9 +181,9 @@ function getLocations(){
     p0 = participantPickup;
     p0Mod = p0 % width;
     orderOfLocations[p0Mod] = p0;
-
-    orderOfLocations[width] = endLocation - 2;
-
+    d0 = endLocation - 2;
+    d0Mod = d0 % width;
+    orderOfLocations[d0Mod] = d0;
     //makes a list of all locations in order.
     columnIndex = Object.keys(orderOfLocations);
 }
@@ -171,7 +196,6 @@ function addLocations(passengerID){
     $(".minorRoute").css("display", "block");
 
     //gets the DOM element for the pick up location.
-    // var pickup = $(".grid div:nth-child(" + (passengerID == 1 ? p0 : passengerID == 2 ? p1 : p2) + ")");
     var pickup = $(".grid div:nth-child(" + p0 + ")");
 
     if(passengerID == 1){
@@ -179,7 +203,7 @@ function addLocations(passengerID){
         pickup.append("<img class='p1pick' src='images/d1p.png'"+
         "alt='Destination'><strong class= 'locTag p1Tag'> Your Pickup !</strong>");
 
-        var dropoff = $(".grid div:nth-child(" + (endLocation - 2) + ")");
+        var dropoff = $(".grid div:nth-child(" + d0 + ")");
         dropoff.append("<img class='p1dest'src='images/d1d.png' alt='Destination'>"+
         "<strong class= 'p1Tag locTag' >Your Dropoff !</strong>");
     }
@@ -189,7 +213,6 @@ function addLocations(passengerID){
 function updateRoute(cell){
     let displacedCells = 0; //number of cells moved up/down
     let direction = '';
-    var dest = 0; //passengerID for drop off
 
     //get the best route between car and cell
     //if location in the same line => keep going right
@@ -225,10 +248,6 @@ function updateRoute(cell){
     }
     //if location is down
     else if(carLocation + width < cell){
-        //add the destination image to the screen along with the route.
-        if(treatment == 2){
-            //
-        }
         //direction is changed to "down" for animate to remove visited location
         direction = "down";
         //gets to the same column
@@ -276,9 +295,27 @@ function redirectURL(){
     window.location.replace(url);
 }
 
+function calcDistance(){
+    // get the bounding rectangles
+    var div1rect = $(".p1pick")[0].getBoundingClientRect();
+    var div2rect = $(".p1dest")[0].getBoundingClientRect();
+
+    // get div1's center point
+    var div1x = div1rect.left + div1rect.width/2;
+    var div1y = div1rect.top + div1rect.height/2;
+
+    // get div2's center point
+    var div2x = div2rect.left + div2rect.width/2;
+    var div2y = div2rect.top + div2rect.height/2;
+
+    // calculate the distance using the Pythagorean Theorem (a^2 + b^2 = c^2)
+    var distanceSquared = Math.pow(div1x - div2x, 2) + Math.pow(div1y - div2y, 2);
+    var distance = Math.sqrt(distanceSquared);
+    console.log(distance);
+    return distance;
+}
+
 //animate car includes:
-//pauseAndRemove - pauses the car at destinations,
-//                 removes the destination image when visited, -- COMMENTED OUT
 //                 changes the images of the car according to the passengers in it
 //adjustRoute - rotates and moves the car up/down. Recursively calls itself to work through the route.
 function animateCar(cell, displacedCells, dir){
@@ -320,39 +357,12 @@ function animateCar(cell, displacedCells, dir){
                 }, 5000);
             }
             //change the image to have passengers in car.
-            if(treatment == 2){
-                if(numStopsReached == 1){
-                    document.getElementById("car").src = 'images/car1.png';
+            if(numStopsReached == 1){
+                document.getElementById("car").src = 'images/car1.png';
 
-                }
-                else if(numStopsReached == 2){
-                    document.getElementById("car").src = 'images/car.png';
-                }
             }
-            //add location of second passenger to the screen according to the treatment
-            // if(treatment == 2 && numStopsReached == 3){
-            //     addLocations(3);
-            // }
-            if(numStopsReached == 2){
-                clearInterval(ratingInterval);
-
-                let timeAtOpen, timeAtClose;
-                Swal.fire({
-                    title: "Notice",
-                    text: "You have reached your destination!",
-                    type: "success",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    onOpen: function() {
-                        timeAtOpen = performance.now();
-                    },
-                    onClose: function() {
-                        timeAtClose = performance.now();
-                        responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
-                        redirectURL();
-                    }
-                });
+            else if(numStopsReached == 2){
+                document.getElementById("car").src = 'images/car.png';
             }
             setTimeout(function(){
                 //brings car back to track.
@@ -379,9 +389,17 @@ function animateCar(cell, displacedCells, dir){
         }
     }//recursively calls itself to shift route
     function adjustRoute(){
-        let normalSpeed = 6.5;
-        let prePickUpSpeed = 20;
+        let calcSpeed = Math.floor(calcDistance() / 180);
 
+        let normalSpeed;
+        if(calcDistance() > 600){
+            normalSpeed = calcSpeed + 1;
+        }
+        else{
+            normalSpeed = calcSpeed;
+        }
+        console.log(normalSpeed);
+        let prePickUpSpeed = 20;
         let carSpeed = normalSpeed;
 
         if(route.length > 0){
