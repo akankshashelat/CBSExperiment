@@ -1,9 +1,10 @@
 //set the treatment number
-// Treatment 2: drop off order: P2, P3, P1
 let treatment = 2;
 let delayNotice = false;
 let delayOver = false;
-let alert = 0;
+// let alertOver = false;
+let newDistance;
+let newDistanceDone = false;
 //sizeOfGrid
 let gridSize = 70;
 
@@ -26,9 +27,11 @@ let columnIndex = [];
 //p0 is the participant
 //p1,p2,d1,d2
 let p0 = 0;
-// p1 = 0, p2 = 0, , d1 = 0, d2 = 0;
 let p0Mod = 0;
-// p1Mod = 0, p2Mod = 0, d1Mod = 0, d2Mod = 0;
+
+//distance between p0 and d0
+let pixelDistance;
+
 
 //user rating
 let ratingList = [];
@@ -92,6 +95,30 @@ function addToScreen() {
     //create and adjust height of the trail to the locations.
     $(".minorRoute").height($(".grid div").height());
 }
+//this is the distance from the location of car when delay is announced
+//to the destination of P1
+function calcNewDistance(){
+
+    newDistanceDone = true;
+    // get the bounding rectangles
+    var div1rect = $("#car")[0].getBoundingClientRect();
+    var div2rect = $(".p1dest")[0].getBoundingClientRect();
+
+    // get div1's center point
+    var div1x = div1rect.left + div1rect.width/2;
+    var div1y = div1rect.top + div1rect.height/2;
+
+    // get div2's center point
+    var div2x = div2rect.left + div2rect.width/2;
+    var div2y = div2rect.top + div2rect.height/2;
+
+    // calculate the distance using the Pythagorean Theorem (a^2 + b^2 = c^2)
+    var distanceSquared = Math.pow(div1x - div2x, 2) + Math.pow(div1y - div2y, 2);
+    var distance = Math.sqrt(distanceSquared);
+
+    return distance;
+}
+
 function delayOverAlert(){
     let timeAtOpen, timeAtClose;
     Swal.fire({
@@ -103,15 +130,17 @@ function delayOverAlert(){
         allowEnterKey: false,
         onOpen: function() {
             timeAtOpen = performance.now();
+            // alertOver = true;
+            newDistance = calcNewDistance();
         },
         onClose: function() {
-            alert = 1;
             timeAtClose = performance.now();
             responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
         }
     });
 }
 //timer
+//holds condition for when to finish delay.
 function updateTimer(duration, passengerID) {
 
     var display = document.querySelector('#timeP' + passengerID);
@@ -124,9 +153,11 @@ function updateTimer(duration, passengerID) {
             seconds = parseInt(timer % 60, 10);
 
             //time for end of delay
-            if(minutes == 2 && seconds == 20){
-                // delayOverAlert();
+            if(minutes == 2 && seconds == 45){
                 delayOver = true;
+                delayOverAlert();
+                //we've shown the delayNotice once already, so change it to false;
+                delayNotice = false;
             }
 
             minutes = minutes < 10 ? "0" + minutes : minutes;
@@ -179,7 +210,10 @@ function getLocations(){
     p0Mod = p0 % width;
     orderOfLocations[p0Mod] = p0;
 
-    orderOfLocations[width] = endLocation - 2;
+    d0 = endLocation - 2;
+    d0Mod = d0 % width;
+
+    orderOfLocations[d0Mod] = d0;
 
     //makes a list of all locations in order.
     columnIndex = Object.keys(orderOfLocations);
@@ -211,7 +245,6 @@ function addLocations(passengerID){
             let time = minutes + ":" + seconds;
 
             let timeAtOpen, timeAtClose;
-
             Swal.fire({
                 title: "Alert!",
                 text: "Delayed! New time is " + time,
@@ -221,21 +254,20 @@ function addLocations(passengerID){
                 allowEnterKey: false,
                 onOpen: function() {
                     timeAtOpen = performance.now();
+                    delayNotice = true;
                 },
                 onClose: function() {
-                    delayNotice = true;
                     timeAtClose = performance.now();
                     responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
                 }
             });
-        }, 30);
+        }, 3000);
     }
     //display the displaced route
     //only if its the first stop since its handled separately
     $(".minorRoute").css("display", "block");
 
     //gets the DOM element for the pick up location.
-    // var pickup = $(".grid div:nth-child(" + (passengerID == 1 ? p0 : passengerID == 2 ? p1 : p2) + ")");
     var pickup = $(".grid div:nth-child(" + p0 + ")");
 
     if(passengerID == 1){
@@ -243,7 +275,7 @@ function addLocations(passengerID){
         pickup.append("<img class='p1pick' src='images/d1p.png'"+
         "alt='Destination'><strong class= 'locTag p1Tag'> Your Pickup !</strong>");
 
-        var dropoff = $(".grid div:nth-child(" + (endLocation - 2) + ")");
+        var dropoff = $(".grid div:nth-child(" + d0 + ")");
         dropoff.append("<img class='p1dest'src='images/d1d.png' alt='Destination'>"+
         "<strong class= 'p1Tag locTag' >Your Dropoff !</strong>");
     }
@@ -253,7 +285,6 @@ function addLocations(passengerID){
 function updateRoute(cell){
     let displacedCells = 0; //number of cells moved up/down
     let direction = '';
-    var dest = 0; //passengerID for drop off
 
     //get the best route between car and cell
     //if location in the same line => keep going right
@@ -340,9 +371,27 @@ function redirectURL(){
     window.location.replace(url);
 }
 
+function calcDistanceFromPickUp(){
+    // get the bounding rectangles
+    var div1rect = $(".p1pick")[0].getBoundingClientRect();
+    var div2rect = $(".p1dest")[0].getBoundingClientRect();
+
+    // get div1's center point
+    var div1x = div1rect.left + div1rect.width/2;
+    var div1y = div1rect.top + div1rect.height/2;
+
+    // get div2's center point
+    var div2x = div2rect.left + div2rect.width/2;
+    var div2y = div2rect.top + div2rect.height/2;
+
+    // calculate the distance using the Pythagorean Theorem (a^2 + b^2 = c^2)
+    var distanceSquared = Math.pow(div1x - div2x, 2) + Math.pow(div1y - div2y, 2);
+    var distance = Math.sqrt(distanceSquared);
+    return distance;
+}
+
 //animate car includes:
 //pauseAndRemove - pauses the car at destinations,
-//                 removes the destination image when visited, -- COMMENTED OUT
 //                 changes the images of the car according to the passengers in it
 //adjustRoute - rotates and moves the car up/down. Recursively calls itself to work through the route.
 function animateCar(cell, displacedCells, dir){
@@ -393,10 +442,6 @@ function animateCar(cell, displacedCells, dir){
                     document.getElementById("car").src = 'images/car.png';
                 }
             }
-            //add location of second passenger to the screen according to the treatment
-            // if(treatment == 2 && numStopsReached == 3){
-            //     addLocations(3);
-            // }
             if(numStopsReached == 2){
                 clearInterval(ratingInterval);
 
@@ -441,12 +486,27 @@ function animateCar(cell, displacedCells, dir){
                 }
             }, 1000);
         }
-    }//recursively calls itself to shift route
+    }
+
+    //recursively calls itself to shift route
     function adjustRoute(){
-        let normalSpeed = 15;
-        let prePickUpSpeed = 30;
-        let delaySpeed = 7;
-        let carSpeed = normalSpeed;
+        //In this condition, 3 speeds: preDelay, delaySpeed, postDelay
+        //Here, the preDelay acts as Normal speed i.e default
+        let preDelay, delaySpeed, postDelay;
+
+        let prePickUpSpeed = 20;
+
+        //calcSpeed is the approx speed.
+        let calcSpeed = Math.floor(calcDistanceFromPickUp() / 180);
+        if(calcDistanceFromPickUp() > 600){
+            preDelay = calcSpeed + 1;
+        }
+        else{
+            preDelay = calcSpeed;
+        }
+
+        //carSpeed is the actual speed of the car used in swtich case.
+        let carSpeed = preDelay;
 
         if(route.length > 0){
             var direction = route[0];
@@ -462,16 +522,24 @@ function animateCar(cell, displacedCells, dir){
                     if(numStopsReached == 0){
                         carSpeed = prePickUpSpeed;
                     }
+
                     //the car slows down after delay notice.
                     if(delayNotice == true){
+                        if(newDistanceDone == false){
+                            newDistance = calcNewDistance();
+                        }
+                        delaySpeed = Math.floor(newDistance/180);
                         carSpeed = delaySpeed;
                     }
+
                     //the car goes back to normal speeds after some time
                     if (delayOver == true){
-                        if(alert == 0){
-                            delayOverAlert();
-                        }
-                         carSpeed = normalSpeed;
+                        // if(alertOver == false){
+                        //     delayOverAlert();
+                        //     newDistance = calcNewDistance();
+                        // }
+                        postDelay = Math.ceil(newDistance / 180);
+                        carSpeed = postDelay;
                     }
                     $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
