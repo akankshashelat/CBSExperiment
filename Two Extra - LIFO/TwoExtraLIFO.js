@@ -2,6 +2,7 @@
 // Treatment 2: drop off order: P2, P3, P1
 let treatment = 2;
 let delayNotice = false;
+let generalSpeed = 0;
 //sizeOfGrid
 let gridSize = 70;
 
@@ -27,6 +28,9 @@ let columnIndex = [];
 //p1,p2,d1,d2
 let p0 = 0, p1 = 0, p2 = 0, d0 = 0, d1 = 0, d2 = 0;
 let p0Mod = 0, d0Mod = 0, p1Mod = 0, p2Mod = 0, d1Mod = 0, d2Mod = 0;
+
+//up and down distances
+let additionalDistance1, additionalDistance2 = 0;
 
 //user rating
 let ratingList = [];
@@ -156,13 +160,18 @@ function countDown(passengerID) {
     //start the timer from 1 minutes
     let countDown, countdownText;
     if (passengerID == 1) {
+        countDown = 3;
+        countdownText = "03:00"
+    }
+    else if (passengerID == 2){
+        countDown = 2;
+        countdownText = "02:00"
+    }
+    else{
         countDown = 1;
         countdownText = "01:00"
     }
-    else {
-        countDown = 0;
-        countdownText = "00:30"
-    }
+
     let passengerTimer = document.getElementById("timeBoardP" + passengerID);
     passengerTimer.style.display = "block";
 
@@ -225,7 +234,7 @@ function getLocations(){
     orderOfLocations[d2Mod] = d2;
 
     //go to the end location always
-    orderOfLocations[width] = endLocation;
+    // orderOfLocations[width] = endLocation;
 
     //makes a list of all locations in order.
     columnIndex = Object.keys(orderOfLocations);
@@ -239,12 +248,12 @@ function addLocations(passengerID){
         setTimeout(function (){
             //increase the timer for P1 (existing time + 180 seconds)
             let newDuration = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
-            parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 180;
+            parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
             updateTimer(newDuration, 1);
 
             //calculates time for the announcement (existing time + 180 seconds)
             let minutes = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]);
-            let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 180;
+            let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
 
             //adjust seconds and minutes based on added time.
             if(seconds >= 60) {
@@ -297,15 +306,66 @@ function addLocations(passengerID){
     }
     else if(passengerID == 2){
         //add the pick up image on the location.
-        pickup.append("<img class='pickup' src='images/d2p.png'"+
+        pickup.append("<img class='pickup d2p' src='images/d2p.png'"+
         "alt='Destination'><strong class= 'locTag p2Tag pickupTag' >Pick up Passenger 2</strong>");
     }
     else{ //if(passengerID == 3)
         //add the pick up image on the location.
-        pickup.append("<img class='pickup' src='images/d3p.png' "+
+        pickup.append("<img class='pickup d3p' src='images/d3p.png' "+
         "alt='Destination'><strong class= 'locTag p3Tag' >Pick up Passenger 3</strong>");
+        // calcDistance(2);
     }
 }
+
+// function setSpeed(distance, stops){
+//     //global - don't need to return
+//     generalSpeed = Math.floor(distance/ 180);
+//     if(stops == 2){
+//         generalSpeed = Math.floor(distance/ 60) + 3; //13
+//         console.log("distance for p2", distance);
+//         console.log("speed for p2", generalSpeed);
+//     }
+//     if(stops == 3){
+//         //STILL TOO FAST ?????????? WHYYYY
+//         let timeLeft = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
+//             parseInt(document.getElementById("timeP1").innerHTML.split(":")[1])
+//             console.log("time for p1", timeLeft);
+//         generalSpeed = Math.floor(distance/ timeLeft);
+//         console.log("distance for p1", distance);
+//         console.log("speed for p1", generalSpeed);
+//     }
+// }
+
+// function calcDistance(stops){
+//     // get the bounding rectangles
+//     console.log(stops);
+
+//     if(stops == 0){//pickup1
+//         var div1rect = $(".p1pick")[0].getBoundingClientRect();
+//         var div2rect = $(".p1dest")[0].getBoundingClientRect();
+//     }
+//     if(stops == 2){//pickup2
+//         console.log("its getting here!");
+//         var div1rect = $(".d2p")[0].getBoundingClientRect();
+//         var div2rect = $(".d3p")[0].getBoundingClientRect();
+//     }
+//     if(stops == 3){//
+//         var div1rect = $(".destination")[0].getBoundingClientRect();
+//         var div2rect = $(".p1dest")[0].getBoundingClientRect();
+//     }
+//     // get div1's center point
+//     var div1x = div1rect.left + div1rect.width/2;
+//     var div1y = div1rect.top + div1rect.height/2;
+
+//     // get div2's center point
+//     var div2x = div2rect.left + div2rect.width/2;
+//     var div2y = div2rect.top + div2rect.height/2;
+
+//     // calculate the distance using the Pythagorean Theorem (a^2 + b^2 = c^2)
+//     var distanceSquared = Math.pow(div1x - div2x, 2) + Math.pow(div1y - div2y, 2);
+//     var distance = Math.sqrt(distanceSquared);
+//     setSpeed(distance, stops);
+// }
 
 //creates route to the next location
 function updateRoute(cell){
@@ -327,7 +387,7 @@ function updateRoute(cell){
         //add the destination image to the screen along with the route.
         if(numStopsReached == 3){
             var dropoff = $(".grid div:nth-child(" + d2 + ")");
-            dropoff.append("<img class='destination' src='images/d3d.png' alt='Destination'><strong class= 'locTag p3Tag tagAbove' >Drop off Passenger 3</strong>");
+            dropoff.append("<img class='destination d3d' src='images/d3d.png' alt='Destination'><strong class= 'locTag p3Tag tagAbove' >Drop off Passenger 3</strong>");
         }
         //direction is changed to "up" for animate to remove visited location
         direction = "up";
@@ -355,7 +415,7 @@ function updateRoute(cell){
         //add the destination image to the screen along with the route.
         if(numStopsReached == 4){
             var dropoff = $(".grid div:nth-child(" + d1 + ")");
-            dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
+            dropoff.append("<img class='destination d2d' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
         }
         //direction is changed to "down" for animate to remove visited location
         direction = "down";
@@ -480,10 +540,10 @@ function animateCar(cell, displacedCells, dir){
 
             //ADD CALL TO ADD TIMER FOR P2
             if(numStopsReached == 2){
-                updateTimer(30, 2);
+                updateTimer(120, 2);
             }
             else if(numStopsReached == 3){
-                updateTimer(30, 3);
+                updateTimer(60, 3);
             }
 
             //update timers to remove them from screen once their destination is reached.
@@ -553,11 +613,25 @@ function animateCar(cell, displacedCells, dir){
     }
 
     function adjustRoute(){
-        let normalSpeed = 15;
-        let prePickUpSpeed = 30;
-        let delaySpeed = 7;
-
-        let carSpeed = normalSpeed;
+        let carSpeed = 0;
+        let prePickUpSpeed = 20;
+        if(numStopsReached == 1 || numStopsReached == 5){
+            generalSpeed = 5;
+        }
+        if(numStopsReached == 2){
+            generalSpeed = 20;
+        }
+        if(numStopsReached == 3){
+            generalSpeed = 8.5;
+        }
+        if(numStopsReached == 4){
+            generalSpeed = 20;
+        }
+        carSpeed = generalSpeed;
+        //the car is faster before P1 gets picked up.
+        if(numStopsReached == 0){
+            carSpeed = prePickUpSpeed;
+        }
         if(route.length > 0){
             var direction = route[0];
             switch(direction) {
@@ -572,10 +646,6 @@ function animateCar(cell, displacedCells, dir){
                     if(numStopsReached == 0){
                         carSpeed = prePickUpSpeed;
                     }
-                    //the car slows down after delay notice.
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
                             pauseAndRemove();
@@ -588,9 +658,6 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(-90deg)",
                         "transform": "rotate(-90deg)"
                     });
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"top": "-=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
@@ -603,9 +670,6 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(90deg)",
                         "transform": "rotate(90deg)"
                     });
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"top": "+=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();

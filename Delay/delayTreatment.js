@@ -2,7 +2,7 @@
 let treatment = 2;
 let delayNotice = false;
 let delayOver = false;
-// let alertOver = false;
+
 let newDistance;
 let newDistanceDone = false;
 //sizeOfGrid
@@ -534,10 +534,6 @@ function animateCar(cell, displacedCells, dir){
 
                     //the car goes back to normal speeds after some time
                     if (delayOver == true){
-                        // if(alertOver == false){
-                        //     delayOverAlert();
-                        //     newDistance = calcNewDistance();
-                        // }
                         postDelay = Math.ceil(newDistance / 180);
                         carSpeed = postDelay;
                     }
