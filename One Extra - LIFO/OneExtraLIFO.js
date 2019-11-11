@@ -1,7 +1,7 @@
 //set the treatment number
 // Treatment 2: drop off order: P2, P3, P1
 let treatment = 2;
-let delayNotice = false;
+let generalSpeed = 0;
 //sizeOfGrid
 let gridSize = 70;
 
@@ -139,15 +139,15 @@ function updateTimer(duration, passengerID) {
 //displays the countdown, countdown starts from 3 mins.
 //calls updateTimer
 function countDown(passengerID) {
-    //start the timer from 1 minutes
+    //start the timer from 3 min for P1
     let countDown, countdownText;
     if (passengerID == 1) {
         countDown = 3;
         countdownText = "03:00"
     }
     else {
-        countDown = 0;
-        countdownText = "00:30"
+        countDown = 2;
+        countdownText = "02:00"
     }
     let passengerTimer = document.getElementById("timeBoardP" + passengerID);
     passengerTimer.style.display = "block";
@@ -243,7 +243,6 @@ function addLocations(passengerID){
                     timeAtOpen = performance.now();
                 },
                 onClose: function() {
-                    delayNotice = true;
                     timeAtClose = performance.now();
                     responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
                 }
@@ -316,12 +315,12 @@ function updateRoute(cell){
     //if location is down
     else if(carLocation + width < cell){
         //add the destination image to the screen along with the route.
-        if(treatment == 2){
+        // if(treatment == 2){
             if(numStopsReached == 2){
                 var dropoff = $(".grid div:nth-child(" + d1 + ")");
                 dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
             }
-        }
+        // }
         //direction is changed to "down" for animate to remove visited location
         direction = "down";
         //gets to the same column
@@ -372,7 +371,7 @@ function redirectURL(){
     //remove last & sign
     url = url.slice(0,-1);
     //console.log(url); FOR TESTING URL
-    window.location.replace(url);
+    // window.location.replace(url);
 }
 
 //animate car includes:
@@ -419,7 +418,7 @@ function animateCar(cell, displacedCells, dir){
                 }, 5000);
             }
             //change the image to have passengers in car.
-            if(treatment == 2){
+            // if(treatment == 2){
                 if(numStopsReached == 1 || numStopsReached == 3){
                     document.getElementById("car").src = 'images/car1.png';
 
@@ -433,7 +432,7 @@ function animateCar(cell, displacedCells, dir){
 
                 //ADD CALL TO ADD TIMER FOR P2
                 if(numStopsReached == 2){
-                    updateTimer(70, 2);
+                    updateTimer(120, 2);
                 }
 
                 //update timers to remove them from screen once their destination is reached.
@@ -441,7 +440,7 @@ function animateCar(cell, displacedCells, dir){
                     clearInterval(timerInstance2);
                     document.getElementById("p2Time").style.display = "none";
                 }
-            }
+            // }
             if(numStopsReached == 4){
                 clearInterval(ratingInterval);
 
@@ -490,11 +489,21 @@ function animateCar(cell, displacedCells, dir){
     }
     //recursively calls itself to shift route
     function adjustRoute(){
-        let normalSpeed = 15;
-        let prePickUpSpeed = 30;
-        let delaySpeed = 7;
+        let carSpeed = 0;
+        let prePickUpSpeed = 20;
+        //the car is faster before P1 gets picked up.
+        if(numStopsReached == 0){
+            carSpeed = prePickUpSpeed;
+        }
+        else if(numStopsReached == 1 || numStopsReached == 3){
+            generalSpeed = 5.5;
+            carSpeed = generalSpeed;
+        }
+        else if(numStopsReached == 2){
+            generalSpeed = 7;
+            carSpeed = generalSpeed;
+        }
 
-        let carSpeed = normalSpeed;
         if(route.length > 0){
             var direction = route[0];
             switch(direction) {
@@ -505,14 +514,6 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(0deg)",
                         "transform": "rotate(0deg)"
                     });
-                    //the car is faster before P1 gets picked up.
-                    if(numStopsReached == 0){
-                        carSpeed = prePickUpSpeed;
-                    }
-                    //the car slows down after delay notice.
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
                             pauseAndRemove();
@@ -525,9 +526,6 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(-90deg)",
                         "transform": "rotate(-90deg)"
                     });
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"top": "-=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
@@ -540,9 +538,6 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(90deg)",
                         "transform": "rotate(90deg)"
                     });
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"top": "+=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
