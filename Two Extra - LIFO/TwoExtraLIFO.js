@@ -230,7 +230,7 @@ function getLocations(){
     orderOfLocations[d2Mod] = d2;
 
     //go to the end location always
-    // orderOfLocations[width] = endLocation;
+    orderOfLocations[width] = endLocation;
 
     //makes a list of all locations in order.
     columnIndex = Object.keys(orderOfLocations);
