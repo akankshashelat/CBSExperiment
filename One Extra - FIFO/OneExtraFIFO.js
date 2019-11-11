@@ -392,7 +392,6 @@ function animateCar(cell, displacedCells, dir){
                 }, 5000);
             }
             //change the image to have passengers in car.
-
             if(numStopsReached == 1){
                 document.getElementById("car").src = 'images/car1.png';
 
