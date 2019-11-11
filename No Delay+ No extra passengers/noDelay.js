@@ -12,8 +12,6 @@ let width = Math.floor($(window).width()/gridSize);
 let height = Math.floor($(window).height()/gridSize);
 let ratioW = Math.floor($(window).width()/gridSize),
 ratioH = Math.floor($(window).height()/gridSize);
-console.log(ratioW);
-
 //previous timer instances
 let timerInstance1;
 
@@ -311,7 +309,6 @@ function calcDistance(){
     // calculate the distance using the Pythagorean Theorem (a^2 + b^2 = c^2)
     var distanceSquared = Math.pow(div1x - div2x, 2) + Math.pow(div1y - div2y, 2);
     var distance = Math.sqrt(distanceSquared);
-    console.log(distance);
     return distance;
 }
 
@@ -390,7 +387,6 @@ function animateCar(cell, displacedCells, dir){
     }//recursively calls itself to shift route
     function adjustRoute(){
         let calcSpeed = Math.floor(calcDistance() / 180);
-
         let normalSpeed;
         if(calcDistance() > 600){
             normalSpeed = calcSpeed + 1;
@@ -398,7 +394,6 @@ function animateCar(cell, displacedCells, dir){
         else{
             normalSpeed = calcSpeed;
         }
-        console.log(normalSpeed);
         let prePickUpSpeed = 20;
         let carSpeed = normalSpeed;
 
