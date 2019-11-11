@@ -160,9 +160,13 @@ function countDown(passengerID) {
         countDown = 3;
         countdownText = "03:00"
     }
-    else {
-        countDown = 0;
-        countdownText = "00:00"
+    else if (passengerID == 2){
+        countDown = 3.5;
+        countdownText = "03:30"
+    }
+    else{
+        countDown = 2.5;
+        countdownText = "02:30"
     }
     let passengerTimer = document.getElementById("timeBoardP" + passengerID);
     passengerTimer.style.display = "block";
@@ -218,11 +222,14 @@ function getLocations(){
     d2Mod = d2 % width;
 
     orderOfLocations[p2Mod] = p2;
-    orderOfLocations[d2Mod] = d2;
+    //d1Mod and d2Mod are the same so d1Mod's value get overwritten
+    //so the same key needs 2 values
+    if(d1Mod == d2Mod){
+        orderOfLocations[d2Mod] = [d1,d2];
+    }
 
     //go to the end location always
     orderOfLocations[width] = endLocation;
-
     //makes a list of all locations in order.
     columnIndex = Object.keys(orderOfLocations);
 }
@@ -335,11 +342,6 @@ function updateRoute(cell){
             displacedCells++;
         }
 
-        //display the displaced route
-        //only if its not the first stop since that is handled separately
-        if (numStopsReached > 1) {
-            $(".minorRoute").css("display", "block");
-        }
     }
     //if location is down
     else if(carLocation + width < cell){
@@ -468,7 +470,7 @@ function animateCar(cell, displacedCells, dir){
 
             //ADD CALL TO ADD TIMER FOR P2
             if(numStopsReached == 2){
-                updateTimer(45, 2);
+                updateTimer(210, 2);
                 //add the destination image once P2 is picked up.
                 var dropoff = $(".grid div:nth-child(" + d1 + ")");
                 dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'>" +
@@ -486,14 +488,14 @@ function animateCar(cell, displacedCells, dir){
             }
             //ADD TIMER FOR P3
             if(numStopsReached == 3){
-                updateTimer(45, 3);
+                updateTimer(150, 3);
                 //add the destination image to the screen along with the route.
                 var dropoff = $(".grid div:nth-child(" + d2 + ")");
                 dropoff.append("<img class='destination' src='images/d3d.png' alt='Destination'>" +
                 "<strong class= 'locTag p3Tag tagAbove' >Drop off Passenger 3</strong>");
 
                 let minorCalculate2 = d2 + width;
-                while (minorCalculate2 < (endLocation - 1)) {
+                while (minorCalculate2 <= (endLocation - 1)) {
                     $(".grid div:nth-child("+ minorCalculate2 + ")").prepend("<div class='minorRoute'></div>");
                     minorCalculate2 = minorCalculate2 + width;
                 }
@@ -548,23 +550,32 @@ function animateCar(cell, displacedCells, dir){
                         carLocation -= width;
                     }
                 }
-                //remove the visited location from the list.
-                columnIndex.shift();
+                if(numStopsReached != 5){
+                    //remove the visited location from the list.
+                    columnIndex.shift();
+                }
                 if(columnIndex.length > 0){
                     //we know we've paused, so remove that pause from the route before calculating the rest
                     route.shift();
-                    updateRoute(orderOfLocations[columnIndex[0]]);
+                    if(numStopsReached == 4){
+                        updateRoute(orderOfLocations[columnIndex[0]][0]);
+                    }
+                    else if(numStopsReached == 5){
+                        updateRoute(orderOfLocations[columnIndex[0]][1]);
+                    }
+                    else{
+                        updateRoute(orderOfLocations[columnIndex[0]]);
+                    }
                 }
             }, 1000);
         }
     }
     //recursively calls itself to shift route
     function adjustRoute(){
-        let normalSpeed = 15;
-        let prePickUpSpeed = 30;
-        let delaySpeed = 7;
+        let prePickUpSpeed = 20;
+        let generalSpeed = 6.5;
 
-        let carSpeed = normalSpeed;
+        let carSpeed = generalSpeed;
         if(route.length > 0){
             var direction = route[0];
             switch(direction) {
@@ -579,10 +590,6 @@ function animateCar(cell, displacedCells, dir){
                     if(numStopsReached == 0){
                         carSpeed = prePickUpSpeed;
                     }
-                    //the car slows down after delay notice.
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
                             pauseAndRemove();
@@ -595,9 +602,6 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(-90deg)",
                         "transform": "rotate(-90deg)"
                     });
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"top": "-=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
@@ -610,9 +614,6 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(90deg)",
                         "transform": "rotate(90deg)"
                     });
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
                     $("#car").supremate({"top": "+=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();

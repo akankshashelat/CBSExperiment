@@ -144,8 +144,8 @@ function countDown(passengerID) {
         countdownText = "03:00"
     }
     else {
-        countDown = 0;
-        countdownText = "00:00"
+        countDown = 3;
+        countdownText = "03:00"
     }
     let passengerTimer = document.getElementById("timeBoardP" + passengerID);
     passengerTimer.style.display = "block";
@@ -409,7 +409,7 @@ function animateCar(cell, displacedCells, dir){
 
             //ADD CALL TO ADD TIMER FOR P2
             if(numStopsReached == 2){
-                updateTimer(60, 2);
+                updateTimer(180, 2);
                 //add the destination image once P2 is picked up.
                 var dropoff = $(".grid div:nth-child(" + d1 + ")");
                 dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'>" +
