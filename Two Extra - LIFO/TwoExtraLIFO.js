@@ -163,10 +163,6 @@ function countDown(passengerID) {
         countDown = 3;
         countdownText = "03:00"
     }
-    else if (passengerID == 2){
-        countDown = 2;
-        countdownText = "02:00"
-    }
     else{
         countDown = 1;
         countdownText = "01:00"
@@ -317,56 +313,6 @@ function addLocations(passengerID){
     }
 }
 
-// function setSpeed(distance, stops){
-//     //global - don't need to return
-//     generalSpeed = Math.floor(distance/ 180);
-//     if(stops == 2){
-//         generalSpeed = Math.floor(distance/ 60) + 3; //13
-//         console.log("distance for p2", distance);
-//         console.log("speed for p2", generalSpeed);
-//     }
-//     if(stops == 3){
-//         //STILL TOO FAST ?????????? WHYYYY
-//         let timeLeft = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
-//             parseInt(document.getElementById("timeP1").innerHTML.split(":")[1])
-//             console.log("time for p1", timeLeft);
-//         generalSpeed = Math.floor(distance/ timeLeft);
-//         console.log("distance for p1", distance);
-//         console.log("speed for p1", generalSpeed);
-//     }
-// }
-
-// function calcDistance(stops){
-//     // get the bounding rectangles
-//     console.log(stops);
-
-//     if(stops == 0){//pickup1
-//         var div1rect = $(".p1pick")[0].getBoundingClientRect();
-//         var div2rect = $(".p1dest")[0].getBoundingClientRect();
-//     }
-//     if(stops == 2){//pickup2
-//         console.log("its getting here!");
-//         var div1rect = $(".d2p")[0].getBoundingClientRect();
-//         var div2rect = $(".d3p")[0].getBoundingClientRect();
-//     }
-//     if(stops == 3){//
-//         var div1rect = $(".destination")[0].getBoundingClientRect();
-//         var div2rect = $(".p1dest")[0].getBoundingClientRect();
-//     }
-//     // get div1's center point
-//     var div1x = div1rect.left + div1rect.width/2;
-//     var div1y = div1rect.top + div1rect.height/2;
-
-//     // get div2's center point
-//     var div2x = div2rect.left + div2rect.width/2;
-//     var div2y = div2rect.top + div2rect.height/2;
-
-//     // calculate the distance using the Pythagorean Theorem (a^2 + b^2 = c^2)
-//     var distanceSquared = Math.pow(div1x - div2x, 2) + Math.pow(div1y - div2y, 2);
-//     var distance = Math.sqrt(distanceSquared);
-//     setSpeed(distance, stops);
-// }
-
 //creates route to the next location
 function updateRoute(cell){
     let displacedCells = 0; //number of cells moved up/down
@@ -413,10 +359,10 @@ function updateRoute(cell){
     //if location is down
     else if(carLocation + width < cell){
         //add the destination image to the screen along with the route.
-        if(numStopsReached == 4){
-            var dropoff = $(".grid div:nth-child(" + d1 + ")");
-            dropoff.append("<img class='destination d2d' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
-        }
+        // if(numStopsReached == 4){
+        //     var dropoff = $(".grid div:nth-child(" + d1 + ")");
+        //     dropoff.append("<img class='destination d2d' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
+        // }
         //direction is changed to "down" for animate to remove visited location
         direction = "down";
         //gets to the same column
@@ -472,9 +418,9 @@ function redirectURL(){
 
 //animate car includes:
 //pauseAndRemove - pauses the car at destinations,
-//                 removes the destination image when visited, -- COMMENTED OUT
-//                 changes the images of the car according to the passengers in it
-//adjustRoute - rotates and moves the car up/down. Recursively calls itself to work through the route.
+//                 changes the images of the car according to the passengers in it,
+//                 updates timers for P2, P3
+//adjustRoute - rotates and moves the car up/down. Recursively calls itself to work through the route, adjusts speeds
 function animateCar(cell, displacedCells, dir){
     //index of destination
     let stopIndex = route.indexOf("p");
@@ -514,13 +460,6 @@ function animateCar(cell, displacedCells, dir){
                 }, 5000);
             }
 
-            //removes previous destination.
-            // let children = $(".grid div:nth-child(" + cell + ")").children();
-            // var i = dir == "down" ? 1 : 0;
-            // for(i ; i < children.length; i++){
-            //     children[i].remove();
-            // }
-
             //change the image to have passengers in car.
             if(numStopsReached == 1 || numStopsReached == 5){
                 document.getElementById("car").src = 'images/car1.png';
@@ -540,10 +479,24 @@ function animateCar(cell, displacedCells, dir){
 
             //ADD CALL TO ADD TIMER FOR P2
             if(numStopsReached == 2){
-                updateTimer(120, 2);
+                updateTimer(60, 2);
+
+                var dropoff = $(".grid div:nth-child(" + d1 + ")");
+                dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'>" +
+                "<strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
+
+                let minorCalculate1 = d1;
+                while (minorCalculate1 > (endLocation - 1)) {
+                    $(".grid div:nth-child("+ minorCalculate1 + ")").prepend("<div class='minorRoute'></div>");
+                    minorCalculate1 = minorCalculate1 - width;
+                }
+                $(".minorRoute").css("display", "block");
             }
             else if(numStopsReached == 3){
                 updateTimer(60, 3);
+                let timeAddedP2 = parseInt(document.getElementById("timeP2").innerHTML.split(":")[0]) * 60 +
+                parseInt(document.getElementById("timeP2").innerHTML.split(":")[1]) + 60;
+                updateTimer(timeAddedP2, 2);
             }
 
             //update timers to remove them from screen once their destination is reached.
@@ -615,17 +568,18 @@ function animateCar(cell, displacedCells, dir){
     function adjustRoute(){
         let carSpeed = 0;
         let prePickUpSpeed = 20;
+        //adjust speeds
         if(numStopsReached == 1 || numStopsReached == 5){
-            generalSpeed = 5;
+            generalSpeed = 5.5;
         }
         if(numStopsReached == 2){
-            generalSpeed = 20;
+            generalSpeed = 17.5;
         }
         if(numStopsReached == 3){
             generalSpeed = 8.5;
         }
         if(numStopsReached == 4){
-            generalSpeed = 20;
+            generalSpeed = 17.5;
         }
         carSpeed = generalSpeed;
         //the car is faster before P1 gets picked up.
