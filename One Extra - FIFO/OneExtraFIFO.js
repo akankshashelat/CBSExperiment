@@ -1,7 +1,6 @@
 //set the treatment number
 // Treatment 2: drop off order: P2, P3, P1
 let treatment = 2;
-let delayNotice = false;
 //sizeOfGrid
 let gridSize = 70;
 
@@ -242,14 +241,12 @@ function addLocations(passengerID){
                     timeAtOpen = performance.now();
                 },
                 onClose: function() {
-                    delayNotice = true;
                     timeAtClose = performance.now();
                     responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
                 }
             });
-        }, 30);
+        }, 20);
     }
-
     //display the displaced route
     //only if its the first stop since its handled separately
     $(".minorRoute").css("display", "block");
@@ -289,7 +286,6 @@ function updateRoute(cell){
     }
     // if location is above
     else if (carLocation > cell){
-
         //direction is changed to "up" for animate to remove visited location
         direction = "up";
         //gets to the same column
@@ -299,16 +295,10 @@ function updateRoute(cell){
         }
         //go up
         while (carLocation > cell){
-            // $(".grid div:nth-child("+ (carLocation) + ")").prepend("<div class='minorRoute'></div>");
+            $(".grid div:nth-child("+ (carLocation) + ")").prepend("<div class='minorRoute'></div>");
             carLocation -= width;
             route.push("u");
             displacedCells++;
-        }
-
-        //display the displaced route
-        //only if its not the first stop since that is handled separately
-        if (numStopsReached > 1) {
-            $(".minorRoute").css("display", "block");
         }
     }
     //if location is down
@@ -324,17 +314,8 @@ function updateRoute(cell){
         //go down
         while(carLocation < cell){
             carLocation += width;
-
-            //adds the route to destination on the screen.
-            // $(".grid div:nth-child("+ (carLocation) + ")").prepend("<div class='minorRoute'></div>");
             route.push("d");
             displacedCells++;
-        }
-
-        //display the displaced route
-        //only if its not the first stop since that is handled separately
-        if (numStopsReached > 1) {
-            $(".minorRoute").css("display", "block");
         }
     }
     //pause before going back to track
@@ -428,7 +409,7 @@ function animateCar(cell, displacedCells, dir){
 
             //ADD CALL TO ADD TIMER FOR P2
             if(numStopsReached == 2){
-                updateTimer(70, 2);
+                updateTimer(60, 2);
                 //add the destination image once P2 is picked up.
                 var dropoff = $(".grid div:nth-child(" + d1 + ")");
                 dropoff.append("<img class='destination' src='images/d2d.png' alt='Destination'>" +
@@ -497,11 +478,10 @@ function animateCar(cell, displacedCells, dir){
     }
     //recursively calls itself to shift route
     function adjustRoute(){
-        let normalSpeed = 15;
-        let prePickUpSpeed = 30;
-        let delaySpeed = 7;
+        let prePickUpSpeed = 20;
+        let generalSpeed = 5;
 
-        let carSpeed = normalSpeed;
+        let carSpeed = generalSpeed;
         if(route.length > 0){
             var direction = route[0];
             switch(direction) {
@@ -516,10 +496,7 @@ function animateCar(cell, displacedCells, dir){
                     if(numStopsReached == 0){
                         carSpeed = prePickUpSpeed;
                     }
-                    //the car slows down after delay notice.
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
+
                     $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
                             pauseAndRemove();
@@ -532,9 +509,7 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(-90deg)",
                         "transform": "rotate(-90deg)"
                     });
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
+
                     $("#car").supremate({"top": "-=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
@@ -547,9 +522,7 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(90deg)",
                         "transform": "rotate(90deg)"
                     });
-                    if(delayNotice == true){
-                        carSpeed = delaySpeed;
-                    }
+
                     $("#car").supremate({"top": "+=70"}, carSpeed, "linear", function(){
                         route.shift();
                         pauseAndRemove();
