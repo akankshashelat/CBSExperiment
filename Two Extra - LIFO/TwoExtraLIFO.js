@@ -309,7 +309,6 @@ function addLocations(passengerID){
         //add the pick up image on the location.
         pickup.append("<img class='pickup d3p' src='images/d3p.png' "+
         "alt='Destination'><strong class= 'locTag p3Tag' >Pick up Passenger 3</strong>");
-        // calcDistance(2);
     }
 }
 
