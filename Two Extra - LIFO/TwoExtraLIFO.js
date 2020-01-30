@@ -285,7 +285,7 @@ function addLocations(passengerID){
     }
 
     //display the displaced route
-    //only if its the first stop since its handled separately
+    //only if its the first stop
     $(".minorRoute").css("display", "block");
 
     //gets the DOM element for the pick up location.
@@ -381,9 +381,9 @@ function updateRoute(cell){
 
         //display the displaced route
         //only if its not the first stop since that is handled separately
-        if (numStopsReached > 1) {
-            $(".minorRoute").css("display", "block");
-        }
+        // if (numStopsReached > 1) {
+        //     $(".minorRoute").css("display", "block");
+        // }
     }
     //pause before going back to track
     route.push("p");
@@ -515,7 +515,9 @@ function animateCar(cell, displacedCells, dir){
 
             //add location of third passenger to the screen according to the treatment
             if(numStopsReached == 2){
-                addLocations(3);
+                setTimeout(function(){
+                    addLocations(3);
+                },9000);
             }
             if(numStopsReached == 6){
                 clearInterval(ratingInterval);

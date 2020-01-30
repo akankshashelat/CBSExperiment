@@ -218,7 +218,7 @@ function getLocations(){
     p2 = p0 + (2 * fourthWidth) + (fifthHeight * width);
     p2Mod = p2 % width;
 
-    d2 = (endLocation - 1) - (fifthHeight * width);
+    d2 = endLocation - (fifthHeight * width);
     d2Mod = d2 % width;
 
     orderOfLocations[p2Mod] = p2;
@@ -314,7 +314,6 @@ function addLocations(passengerID){
 function updateRoute(cell){
     let displacedCells = 0; //number of cells moved up/down
     let direction = '';
-    var dest = 0; //passengerID for drop off
 
     //get the best route between car and cell
     //if location in the same line => keep going right
@@ -370,9 +369,9 @@ function updateRoute(cell){
 
         //display the displaced route
         //only if its not the first stop since that is handled separately
-        if (numStopsReached > 1) {
-            $(".minorRoute").css("display", "block");
-        }
+        // if (numStopsReached > 1) {
+        //     $(".minorRoute").css("display", "block");
+        // }
     }
     //pause before going back to track
     route.push("p");
@@ -483,8 +482,13 @@ function animateCar(cell, displacedCells, dir){
                 }
                 $(".minorRoute").css("display", "block");
 
-                addLocations(3);
+            }
 
+            //add location of third passenger to the screen according to the treatment
+            if(numStopsReached == 2){
+                setTimeout(function(){
+                    addLocations(3);
+                },9000);
             }
             //ADD TIMER FOR P3
             if(numStopsReached == 3){
@@ -495,7 +499,7 @@ function animateCar(cell, displacedCells, dir){
                 "<strong class= 'locTag p3Tag tagAbove' >Drop off Passenger 3</strong>");
 
                 let minorCalculate2 = d2 + width;
-                while (minorCalculate2 <= (endLocation - 1)) {
+                while (minorCalculate2 <= endLocation) {
                     $(".grid div:nth-child("+ minorCalculate2 + ")").prepend("<div class='minorRoute'></div>");
                     minorCalculate2 = minorCalculate2 + width;
                 }
