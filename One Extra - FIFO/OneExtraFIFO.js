@@ -389,7 +389,7 @@ function animateCar(cell, displacedCells, dir){
                 setTimeout(function(){
                     //second passenger locations after 5 second delay
                     addLocations(2);
-                }, 5000);
+                }, 8000);
             }
             //change the image to have passengers in car.
             if(numStopsReached == 1){

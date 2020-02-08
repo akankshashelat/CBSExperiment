@@ -1,5 +1,4 @@
-//set the treatment number
-let treatment = 2;
+
 let delayNotice = false;
 //sizeOfGrid
 let gridSize = 70;
@@ -160,13 +159,9 @@ function countDown(passengerID) {
         countDown = 3;
         countdownText = "03:00"
     }
-    else if (passengerID == 2){
+    else{
         countDown = 3.5;
         countdownText = "03:30"
-    }
-    else{
-        countDown = 2.5;
-        countdownText = "02:30"
     }
     let passengerTimer = document.getElementById("timeBoardP" + passengerID);
     passengerTimer.style.display = "block";
@@ -246,6 +241,54 @@ function addLocations(passengerID){
             updateTimer(newDuration, 1);
 
             //calculates time for the announcement (existing time + 60 seconds)
+            let minutes = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]);
+            let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
+
+            //adjust seconds and minutes based on added time.
+            if(seconds >= 60) {
+                let sec = seconds;
+                seconds %= 60;
+                minutes = minutes + Math.floor(sec / 60);
+            }
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            let time = minutes + ":" + seconds;
+
+            let timeAtOpen, timeAtClose;
+
+            Swal.fire({
+                title: "Alert!",
+                text: "New Passenger added. Delayed, new time is " + time,
+                type: "info",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                onOpen: function() {
+                    timeAtOpen = performance.now();
+                },
+                onClose: function() {
+                    delayNotice = true;
+                    timeAtClose = performance.now();
+                    responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
+                }
+            });
+        }, 30);
+    }
+    if(passengerID == 3){
+        setTimeout(function (){
+            //increase the timer for P1
+            let newDuration1 = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
+            parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
+            updateTimer(newDuration1, 1);
+
+            //increase the timer for P2
+            let newDuration2 = parseInt(document.getElementById("timeP2").innerHTML.split(":")[0]) * 60 +
+            parseInt(document.getElementById("timeP2").innerHTML.split(":")[1]) + 60;
+            updateTimer(newDuration2, 2);
+
+            //calculates time for the announcement
             let minutes = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]);
             let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
 
@@ -366,12 +409,6 @@ function updateRoute(cell){
             route.push("d");
             displacedCells++;
         }
-
-        //display the displaced route
-        //only if its not the first stop since that is handled separately
-        // if (numStopsReached > 1) {
-        //     $(".minorRoute").css("display", "block");
-        // }
     }
     //pause before going back to track
     route.push("p");
@@ -444,7 +481,7 @@ function animateCar(cell, displacedCells, dir){
                 setTimeout(function(){
                     //second passenger locations after 5 second delay
                     addLocations(2);
-                }, 5000);
+                }, 8000);
             }
 
             //change the image to have passengers in car.
@@ -492,7 +529,7 @@ function animateCar(cell, displacedCells, dir){
             }
             //ADD TIMER FOR P3
             if(numStopsReached == 3){
-                updateTimer(150, 3);
+                updateTimer(210, 3);
                 //add the destination image to the screen along with the route.
                 var dropoff = $(".grid div:nth-child(" + d2 + ")");
                 dropoff.append("<img class='destination' src='images/d3d.png' alt='Destination'>" +
@@ -577,7 +614,7 @@ function animateCar(cell, displacedCells, dir){
     //recursively calls itself to shift route
     function adjustRoute(){
         let prePickUpSpeed = 20;
-        let generalSpeed = 6.5;
+        let generalSpeed = 5;
 
         let carSpeed = generalSpeed;
         if(route.length > 0){

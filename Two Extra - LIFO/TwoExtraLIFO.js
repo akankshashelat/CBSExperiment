@@ -263,7 +263,7 @@ function addLocations(passengerID){
 
             Swal.fire({
                 title: "Alert!",
-                text: "New Passenger added! New time is " + time,
+                text: "New Passenger added! Delayed, new time is " + time,
                 type: "info",
                 allowOutsideClick: false,
                 allowEscapeKey: false,
