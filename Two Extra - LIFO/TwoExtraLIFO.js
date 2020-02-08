@@ -1,6 +1,4 @@
-//set the treatment number
-// Treatment 2: drop off order: P2, P3, P1
-let treatment = 2;
+//drop off order: P2, P3, P1
 let delayNotice = false;
 let generalSpeed = 0;
 //sizeOfGrid
@@ -8,7 +6,6 @@ let gridSize = 70;
 
 let width = Math.floor($(window).width()/gridSize);
 let height = Math.floor($(window).height()/gridSize);
-
 //previous timer instances
 let timerInstance1;
 let timerInstance2;
@@ -167,7 +164,6 @@ function countDown(passengerID) {
         countDown = 1;
         countdownText = "01:00"
     }
-
     let passengerTimer = document.getElementById("timeBoardP" + passengerID);
     passengerTimer.style.display = "block";
 
@@ -189,7 +185,6 @@ function getLocations(){
 
     //divides grid into equal portions to space out locations.
     //this is to account for screen sizes.
-    var fifthWidth = Math.floor(width/5);
     var fifthHeight = Math.floor(height/5);
 
     //values for locations for Participant
@@ -209,7 +204,7 @@ function getLocations(){
     //this is to account for screen sizes.
     var fourthWidth = Math.floor(middleWidth/4); //divide the middle space into 4 sections
     var fifthHeight = Math.floor(height/5);
-
+    console.log("fifthHeight", fifthHeight);
     //values for locations for additional passengers
     p1 = (p0 + fourthWidth) - width;
     p1Mod = p1 % width;
@@ -238,16 +233,17 @@ function getLocations(){
 
 //increases the timer when new passengers are added.
 //displays the locations on screen for pick up only.
+//announcements for P2 and P3
 function addLocations(passengerID){
     var pickup;
     if(passengerID == 2){
         setTimeout(function (){
-            //increase the timer for P1 (existing time + 180 seconds)
+            //increase the timer for P1 (existing time + 60 seconds)
             let newDuration = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
             parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
             updateTimer(newDuration, 1);
 
-            //calculates time for the announcement (existing time + 180 seconds)
+            //calculates time for the announcement (existing time + 60 seconds)
             let minutes = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]);
             let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
 
@@ -263,6 +259,53 @@ function addLocations(passengerID){
 
             let time = minutes + ":" + seconds;
 
+            let timeAtOpen, timeAtClose;
+
+            Swal.fire({
+                title: "Alert!",
+                text: "New Passenger added! New time is " + time,
+                type: "info",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                onOpen: function() {
+                    delayNotice = true;
+                    timeAtOpen = performance.now();
+                },
+                onClose: function() {
+                    timeAtClose = performance.now();
+                    responseTimes.push(Math.ceil((timeAtClose - timeAtOpen) / 1000));
+                }
+            });
+        }, 20);
+    }
+    else if(passengerID == 3){
+        setTimeout(function (){
+            //increase the timer for P1
+            let newDuration1 = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]) * 60 +
+            parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
+            updateTimer(newDuration1, 1);
+
+            //increase the timer for P2
+            let newDuration2 = parseInt(document.getElementById("timeP2").innerHTML.split(":")[0]) * 60 +
+            parseInt(document.getElementById("timeP2").innerHTML.split(":")[1]) + 60;
+            updateTimer(newDuration2, 2);
+
+            //calculates time for the announcement
+            let minutes = parseInt(document.getElementById("timeP1").innerHTML.split(":")[0]);
+            let seconds = parseInt(document.getElementById("timeP1").innerHTML.split(":")[1]) + 60;
+
+            //adjust seconds and minutes based on added time.
+            if(seconds >= 60) {
+                let sec = seconds;
+                seconds %= 60;
+                minutes = minutes + Math.floor(sec / 60);
+            }
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            let time = minutes + ":" + seconds;
             let timeAtOpen, timeAtClose;
 
             Swal.fire({
@@ -357,11 +400,6 @@ function updateRoute(cell){
     }
     //if location is down
     else if(carLocation + width < cell){
-        //add the destination image to the screen along with the route.
-        // if(numStopsReached == 4){
-        //     var dropoff = $(".grid div:nth-child(" + d1 + ")");
-        //     dropoff.append("<img class='destination d2d' src='images/d2d.png' alt='Destination'><strong class= 'locTag p2Tag' >Drop off Passenger 2</strong>");
-        // }
         //direction is changed to "down" for animate to remove visited location
         direction = "down";
         //gets to the same column
@@ -378,12 +416,6 @@ function updateRoute(cell){
             route.push("d");
             displacedCells++;
         }
-
-        //display the displaced route
-        //only if its not the first stop since that is handled separately
-        // if (numStopsReached > 1) {
-        //     $(".minorRoute").css("display", "block");
-        // }
     }
     //pause before going back to track
     route.push("p");
@@ -456,7 +488,7 @@ function animateCar(cell, displacedCells, dir){
                 setTimeout(function(){
                     //second passenger locations after 5 second delay
                     addLocations(2);
-                }, 5000);
+                }, 8000);
             }
 
             //change the image to have passengers in car.
@@ -476,7 +508,7 @@ function animateCar(cell, displacedCells, dir){
                 document.getElementById("car").src = 'images/car.png';
             }
 
-            //ADD CALL TO ADD TIMER FOR P2
+            //ADD CALL TO ADD TIMER FOR P2, P3
             if(numStopsReached == 2){
                 updateTimer(60, 2);
 
@@ -493,9 +525,6 @@ function animateCar(cell, displacedCells, dir){
             }
             else if(numStopsReached == 3){
                 updateTimer(60, 3);
-                let timeAddedP2 = parseInt(document.getElementById("timeP2").innerHTML.split(":")[0]) * 60 +
-                parseInt(document.getElementById("timeP2").innerHTML.split(":")[1]) + 60;
-                updateTimer(timeAddedP2, 2);
             }
 
             //update timers to remove them from screen once their destination is reached.
@@ -570,7 +599,7 @@ function animateCar(cell, displacedCells, dir){
         let carSpeed = 0;
         let prePickUpSpeed = 20;
         //adjust speeds
-        if(numStopsReached == 1 || numStopsReached == 5){
+        if(numStopsReached == 1){
             generalSpeed = 5.5;
         }
         if(numStopsReached == 2){
@@ -581,6 +610,9 @@ function animateCar(cell, displacedCells, dir){
         }
         if(numStopsReached == 4){
             generalSpeed = 17.5;
+        }
+        if(numStopsReached == 5){
+            generalSpeed = 2.8;
         }
         carSpeed = generalSpeed;
         //the car is faster before P1 gets picked up.
@@ -597,10 +629,6 @@ function animateCar(cell, displacedCells, dir){
                         "-moz-transform": "rotate(0deg)",
                         "transform": "rotate(0deg)"
                     });
-                    //the car is faster before P1 gets picked up.
-                    if(numStopsReached == 0){
-                        carSpeed = prePickUpSpeed;
-                    }
                     $("#car").supremate({"left": "+=70"}, carSpeed, "linear", function(){
                             route.shift();
                             pauseAndRemove();
